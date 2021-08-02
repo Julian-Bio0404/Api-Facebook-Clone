@@ -82,14 +82,12 @@ class Profile(FbModel):
     followers = models.ManyToManyField(
         'users.User', 
         blank=True,
-        null=True,
         related_name='followers'
     )
 
     following = models.ManyToManyField(
         'users.User', 
         blank=True,
-        null=True,
         related_name='following'
     )
 
