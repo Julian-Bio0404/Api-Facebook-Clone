@@ -81,3 +81,11 @@ class Post(FbModel):
     #    blank=True,
     #    null=True
     #)
+
+    def __str__(self):
+        """Return about and username"""
+        return "{} by @{}".format(self.about, self.user.username)
+
+    class Meta:
+        """Meta options."""
+        ordering = ['-created']
