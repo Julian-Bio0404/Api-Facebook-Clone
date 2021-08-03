@@ -75,12 +75,13 @@ class Post(FbModel):
 
     reactions = models.IntegerField(default=0)
 
-    #group = models.ForeignKey(
-    #    'groups.Group',
-    #    on_delete=models.SET_NULL,
-    #    blank=True,
-    #    null=True
-    #)
+    group = models.ForeignKey(
+        'groups.Group',
+        help_text='specify if the post will be published in a group or in the feed',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         """Return about and username"""
