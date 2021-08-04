@@ -24,8 +24,8 @@ class User(FbModel, AbstractUser):
 
     # phone number validator
     phone_regex = RegexValidator(
-        regex=r"\+?1?\d{9,15}$",
-        message='Phone number must be entered in the format: +999999999. Up to 15 digits allowed.'
+        regex=r"^\+1?\d{1,4}[ ]\d{10}$",
+        message='Phone number must be entered in the format: +99 9999999999. Up to indicative + 10 digits allowed.'
     )
 
     phone_number = models.CharField(
