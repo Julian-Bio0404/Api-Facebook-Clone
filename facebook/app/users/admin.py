@@ -13,10 +13,9 @@ class CustomUserAdmin(UserAdmin):
     """User model admin."""
 
     list_display = [
-        'first_name', 'last_name',
-        'email', 'username', 
-        'phone_number', 'is_verified',
-        'created'
+        'pk', 'first_name', 'last_name',
+        'email', 'username', 'phone_number', 
+        'is_verified', 'created'
     ]
 
     search_fields = [
@@ -33,7 +32,7 @@ class ProfileAdmin(admin.ModelAdmin):
     """Profile model admin."""
 
     list_display = [
-        'user', 'hobby', 
+        'pk', 'user', 'hobby', 
         'birth_date', 'origin_country'
     ]
 
@@ -51,7 +50,7 @@ class ProfileDetailAdmin(admin.ModelAdmin):
     """Profile Detail model admin."""
 
     list_display = [
-        'user', 'work',
+        'pk', 'user', 'work',
         'education', 'current_city',
         'web_site', 'social_links'
     ]
