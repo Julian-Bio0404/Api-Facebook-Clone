@@ -44,7 +44,8 @@ LOCAL_APPS = [
     'app.users',
     'app.posts',
     'app.groups',
-    'app.notifications'
+    'app.notifications',
+    'app.taskapp'
 ]
 
 THIRD_PARTY_APPS = [
