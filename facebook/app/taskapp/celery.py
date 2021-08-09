@@ -11,7 +11,7 @@ import os
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'facebook_settings.settings')
 app = Celery(
-    'taskapp', 
+    'celery', 
     include=['taskapp.tasks']
 )
 app.config_from_object('django.conf:settings', namespace='CELERY')

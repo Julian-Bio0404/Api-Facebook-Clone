@@ -77,7 +77,7 @@ class Profile(FbModel):
         blank=True
     )
 
-    datails = models.OneToOneField(ProfileDetail, on_delete=models.CASCADE)
+    datails = models.OneToOneField(ProfileDetail, on_delete=models.CASCADE, blank=True, null=True)
 
     followers = models.ManyToManyField(
         'users.User', 

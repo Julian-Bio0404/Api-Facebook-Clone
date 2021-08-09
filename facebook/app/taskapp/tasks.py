@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Celery
 from celery import shared_task
+from .celery import app
 
 # Models
 from users.models import User
@@ -36,7 +37,7 @@ def gen_verification_token(user):
     }
 
 
-@shared_task # Asynch task
+@app.task # Asynch task
 def send_confirmation_email(user_pk):
     """Send account verification link to given user."""
     user = User.objects.get(pk=user_pk)

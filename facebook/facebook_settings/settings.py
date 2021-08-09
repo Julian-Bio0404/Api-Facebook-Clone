@@ -160,3 +160,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+# Celery
+timezone = TIME_ZONE
+CELERY_BROKER_URL='amqp://guest:guest@localhost:5672//' 
+accept_content = ['json']
+task_serializer = 'json'
+result_serializer = 'json'

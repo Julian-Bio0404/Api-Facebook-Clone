@@ -31,9 +31,12 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'photo',
             'cover_photo',
             'about',
-            'datails',
+            'details',
             'hobby',
             'birth_date',
-            'origin_country'
+            'origin_country',
+            'datails',
+            'followers',
+            'following'
         )
         read_only_fields = ['details']
