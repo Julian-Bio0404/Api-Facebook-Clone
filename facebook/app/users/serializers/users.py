@@ -3,23 +3,24 @@
 # Django
 from django.conf import settings
 from django.contrib.auth import authenticate, password_validation
+from django.core.mail import EmailMultiAlternatives
 from django.core.validators import RegexValidator
+from django.template.loader import render_to_string
+from django.utils import timezone
 
 # Django REST Framework
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.authtoken.models import Token
+
+# Models
+from users.models import Profile, User
 
 # Serializers
 from users.serializers.profiles import ProfileModelSerializer
 
-# Models
-from users.models import User, Profile
-
-# Tasks
-from taskapp.tasks import send_confirmation_email
-
-# Utilities 
+# Utilities
+from datetime import timedelta 
 import jwt
 
 
@@ -92,8 +93,33 @@ class UserSignUpSerializer(serializers.Serializer):
         data.pop('password_confirmation')
         user = User.objects.create_user(**data, is_verified=False)
         Profile.objects.create(user=user)
-        send_confirmation_email.delay(user_pk=user.pk)
+        self.send_confirmation_email(user)
         return user
+
+    def gen_verification_token(self, user):
+        """Create JWT token that the user can use to verify its account."""
+        exp_date = timezone.now() + timedelta(days=2)
+        payload = {
+            'user': user.username,
+            'exp': int(exp_date.timestamp()),
+            'type': 'email_confirmation'
+        }
+        # Generacion del token
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        return token
+
+    def send_confirmation_email(self, user):
+        """Send account verification link to given user."""
+        verification_token = self.gen_verification_token(user)
+        subject = 'Welcome @{}! Verify your account'.format(user.username)
+        from_email = 'Facebook <Facebook.com>'
+        content = render_to_string(
+            'account_verification.html',
+            {'token': verification_token, 'user': user}
+        )
+        msg = EmailMultiAlternatives(subject, content, from_email, [user.email])
+        msg.attach_alternative(content, 'text/html')
+        msg.send()
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -115,14 +141,8 @@ class UserLoginSerializer(serializers.Serializer):
 
     def create(self, data):
         """Generate or retrieve token."""
-        user = self.context['user']
-        refresh = RefreshToken.for_user(user)
-
-        return {
-            'user': self.context['user'],
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+        token, created = Token.objects.get_or_create(user=self.context['user'])
+        return self.context['user'], token.key
 
 
 class AccountVerificationSerializer(serializers.Serializer):

@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,14 +44,13 @@ LOCAL_APPS = [
     'app.users',
     'app.posts',
     'app.groups',
-    'app.notifications',
-    'app.taskapp'
+    'app.notifications'
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
     'django_filters',
-    'rest_framework_simplejwt'
+    'rest_framework.authtoken',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -157,7 +156,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer', 
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     )
 }
 
