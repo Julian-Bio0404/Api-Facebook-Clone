@@ -12,14 +12,13 @@ from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-
 # Models
 from users.models import User
 
 # Serializers
 from users.serializers import (AccountVerificationSerializer,
-                               ProfileModelSerializer,
-                               UserLoginSerializer, UserModelSerializer,
+                               UserLoginSerializer, 
+                               UserModelSerializer,
                                UserSignUpSerializer)
 
 # Utils
