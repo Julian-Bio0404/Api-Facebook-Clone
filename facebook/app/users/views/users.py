@@ -3,7 +3,7 @@
 # Django
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.core.mail import EmailMultiAlternatives, message
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 

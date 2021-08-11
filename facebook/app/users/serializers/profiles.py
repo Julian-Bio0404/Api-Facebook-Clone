@@ -22,7 +22,7 @@ class ProfileDetailModelSerializer(serializers.ModelSerializer):
 class ProfileModelSerializer(serializers.ModelSerializer):
     """Profile model serializer."""
 
-    details = ProfileDetailModelSerializer(read_only=True)
+    profiledetail = ProfileDetailModelSerializer(read_only=True)
 
     class Meta:
         """Meta options."""
@@ -31,12 +31,16 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'photo',
             'cover_photo',
             'about',
-            'details',
             'hobby',
             'birth_date',
             'origin_country',
-            'datails',
+            'followers',
+            'following',
+            'profiledetail'
+        )
+
+        read_only_fields = [
             'followers',
             'following'
-        )
-        read_only_fields = ['details']
+            'profiledetail',
+        ]

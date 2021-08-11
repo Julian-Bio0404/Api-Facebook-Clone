@@ -42,7 +42,7 @@ class ProfileAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['origin_country']
-    ordering = ['user__first_name', 'user__las_name']
+    ordering = ['user__first_name', 'user__last_name']
 
 
 @admin.register(ProfileDetail)
@@ -56,4 +56,4 @@ class ProfileDetailAdmin(admin.ModelAdmin):
     ]
 
     search_fields = ['current_city']
-    ordering = ['user__first_name', 'user__las_name']
+    ordering = ['user__first_name', 'user__last_name']

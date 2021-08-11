@@ -14,7 +14,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 
 # Models
-from users.models import Profile, User
+from users.models import Profile, User, ProfileDetail
 
 # Serializers
 from users.serializers.profiles import ProfileModelSerializer
@@ -93,6 +93,7 @@ class UserSignUpSerializer(serializers.Serializer):
         data.pop('password_confirmation')
         user = User.objects.create_user(**data, is_verified=False)
         Profile.objects.create(user=user)
+        ProfileDetail.objects.create(user=user, profile=user.profile)
         self.send_confirmation_email(user)
         return user
 
