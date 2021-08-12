@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Models
-from users.models import Profile, ProfileDetail
+from users.models import Profile
 
 # Serializers
 from users.serializers import (ProfileDetailModelSerializer,

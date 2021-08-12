@@ -75,12 +75,17 @@ class Post(FbModel):
 
     reactions = models.IntegerField(default=0)
 
-    group = models.ForeignKey(
-        'groups.Group',
-        help_text='specify if the post will be published in a group or in the feed',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True
+    # post destination choices
+    TYPE_DESTINATION = [
+        ('FRIEND', 'friend'), ('GROUP', 'group'),
+        ('BIOGRAPHY', 'biography'), ('PAGE', 'page')
+    ]
+
+    destination = models.CharField(
+        help_text='specify if the post will be published in a group, page, biography of a friend or in your biography',
+        max_length=9,
+        choices=TYPE_DESTINATION,
+        default='BIOGRAPHY'
     )
 
     def __str__(self):
