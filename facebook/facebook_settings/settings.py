@@ -44,6 +44,7 @@ LOCAL_APPS = [
     'app.users',
     'app.posts',
     'app.groups',
+    'app.fbpages',
     'app.notifications'
 ]
 
