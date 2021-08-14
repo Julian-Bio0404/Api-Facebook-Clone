@@ -7,8 +7,10 @@ from rest_framework.response import Response
 
 # Models
 from users.models import Profile
+from posts.models import Post
 
 # Serializers
+from posts.serializers import PostModelSerializer
 from users.serializers import (ProfileDetailModelSerializer,
                                ProfileModelSerializer)
 
@@ -25,6 +27,17 @@ class ProfileViewSet(mixins.ListModelMixin,
     queryset = Profile.objects.all()
     serializer_class = ProfileModelSerializer
     lookup_field = 'user__username'
+
+    def retrieve(self, request, *args, **kwargs):
+        profile = self.get_object()
+        posts = Post.objects.filter(profile=profile)
+        profile_serializer = ProfileModelSerializer(profile).data
+        posts_serializer = PostModelSerializer(posts, many=True).data
+        data = {
+            'profile': profile_serializer,
+            'posts': posts_serializer
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put', 'patch'])
     def update_details(self, request, *args, **kwargs):
