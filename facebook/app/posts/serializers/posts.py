@@ -7,13 +7,13 @@ from rest_framework import serializers
 from posts.models import Post
 
 # Serializers
-from users.serializers import UserModelSerializer
+from users.serializers import UserModelSummarySerializer
 
 
 class PostModelSerializer(serializers.ModelSerializer):
     """Post model serializer."""
 
-    user = UserModelSerializer(read_only=True)
+    user = UserModelSummarySerializer(read_only=True)
 
     class Meta:
         """Meta options."""

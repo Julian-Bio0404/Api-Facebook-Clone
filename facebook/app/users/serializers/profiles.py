@@ -13,10 +13,10 @@ class ProfileDetailModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta options."""
         model = ProfileDetail
-        fields = (
+        fields = [
             'work', 'education', 'current_city',
             'web_site', 'social_links'
-        )
+        ]
 
 
 class ProfileModelSerializer(serializers.ModelSerializer):
@@ -43,4 +43,14 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'followers',
             'following'
             'profiledetail',
+        ]
+
+class ProfileModelSummarySerializer(ProfileModelSerializer):
+    """Profile model data summary serializer."""
+
+    class Meta:
+        """Meta options."""
+        model = Profile
+        fields = [
+            'photo', 'origin_country'
         ]

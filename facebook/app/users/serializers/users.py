@@ -17,7 +17,7 @@ from rest_framework.authtoken.models import Token
 from users.models import Profile, User, ProfileDetail
 
 # Serializers
-from users.serializers.profiles import ProfileModelSerializer
+from .profiles import ProfileModelSerializer, ProfileModelSummarySerializer
 
 # Utilities
 from datetime import timedelta 
@@ -45,6 +45,20 @@ class UserModelSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'profile',
             'is_verified'
+        ]
+
+class UserModelSummarySerializer(UserModelSerializer):
+    """User model data summary serializer."""
+
+    profile = ProfileModelSummarySerializer(read_only=True)
+
+    class Meta:
+        """Meta options."""
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'profile'
         ]
 
 
