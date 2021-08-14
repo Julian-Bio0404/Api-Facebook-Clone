@@ -14,7 +14,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = [
         'pk','user', 'destination','about', 'privacy', 
         'feeling', 'location', 'tag_friends', 
-        'reactions', 'created'
+        'reactions', 'comments', 'created'
     ]
 
     search_fields = [
@@ -35,7 +35,8 @@ class CommentAdmin(admin.ModelAdmin):
     """Comment model admin."""
 
     list_display = [
-        'pk', 'user', 'post', 'text'
+        'pk', 'user', 'post', 
+        'text', 'reactions'
     ]
 
     search_fields = [

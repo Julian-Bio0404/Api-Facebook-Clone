@@ -74,6 +74,7 @@ class Post(FbModel):
     )
 
     reactions = models.IntegerField(default=0)
+    comments = models.IntegerField(default=0)
 
     # post destination choices
     TYPE_DESTINATION = [
