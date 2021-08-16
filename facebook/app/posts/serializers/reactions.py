@@ -5,11 +5,11 @@ from rest_framework import serializers
 
 # Serializers
 from users.serializers import UserModelSummarySerializer
-from posts.serializers import CommentModelSerializer
+from posts.serializers.comments import CommentModelSerializer
+from posts.serializers.posts import PostModelSerializer
 
 # Models
 from posts.models import ReactionComment, ReactionPost
-from posts.serializers import PostModelSerializer
 
 
 class ReactionPostModelSerializer(serializers.ModelSerializer):
@@ -29,19 +29,56 @@ class ReactionPostModelSerializer(serializers.ModelSerializer):
             'user', 'post'
         ]
 
+    def validate(self, data):
+        """Velidate.
+        verify that the user's reaction does not exist yet
+        """
+        try:
+            user = self.context['user']
+            reaction = ReactionPost.objects.get(
+                user=user
+            )
+            # Si la reaccion del usuario existe, esta se elimina
+            reaction.delete()
+            post = self.context['post']
+            post.reactions -= 1
+            post.save()
+        except ReactionPost.DoesNotExist:
+            # Si no existe, procede a crearse
+            return data
+
     def create(self, data):
         """Create a reaction post."""
+        # Reaction post
         user = self.context['user']
-        profile = user.profile
         post = self.context['post']
         reaction_post = ReactionPost.objects.create(
-            **data, 
-            user=user, 
-            profile=profile, 
+            **data,
+            user=user,
+            profile=user.profile,
             post=post
         )
         reaction_post.save()
+
+        # Post
+        post.reactions += 1
+        post.save()
         return reaction_post
+
+
+class ReactionPostModelSummarySerializer(ReactionPostModelSerializer):
+    """Reaction post model summary serializer"""
+
+    class Meta:
+        """Meta options."""
+        model = ReactionPost
+        fields = [
+            'user', 'reaction'
+        ]
+
+        read_only_fields = [
+            'user', 'post'
+        ]
 
 
 class ReactionCommentModelSerializer(serializers.ModelSerializer):
@@ -64,12 +101,11 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
     def create(self, data):
         """Create a reaction comment."""
         user = self.context['user']
-        profile = user.profile
         comment = self.context['comment']
         reaction_comment = ReactionComment.objects.create(
             **data, 
             user=user, 
-            profile=profile, 
+            profile= user.profile, 
             comment=comment
         )
         reaction_comment.save()

@@ -6,10 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Models
-from posts.models import Post
+from posts.models import Post, ReactionComment, ReactionPost
 
 # Serializers
-from posts.serializers import PostModelSerializer
+from posts.serializers import (PostModelSerializer,
+                               ReactionPostModelSerializer, 
+                               ReactionPostModelSummarySerializer)
 
 
 class PostViewSet(mixins.ListModelMixin,
@@ -36,3 +38,32 @@ class PostViewSet(mixins.ListModelMixin,
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def react(self, request, *args, **kwargs):
+        """Create a reaction."""
+        post = self.get_object()
+        serializer = ReactionPostModelSerializer(
+            data=request.data,
+            context={
+                'user': request.user,
+                'post': post
+            })
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = serializer.data
+            return Response(data, status=status.HTTP_201_CREATED)
+        except AssertionError:
+            return Response(
+                {'message': 'The reaction has been delete.'}, 
+                status=status.HTTP_200_OK
+            )
+
+    @action(detail=True, methods=['get'])
+    def reactions(self, request, *args, **kwargs):
+        """List all post's reactions."""
+        reactions = ReactionPost.objects.all()
+        serializer = ReactionPostModelSummarySerializer(reactions, many=True)
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)
