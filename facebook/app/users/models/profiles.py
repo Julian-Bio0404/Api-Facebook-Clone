@@ -34,6 +34,12 @@ class Profile(FbModel):
         blank=True
     )
 
+    friends = models.ManyToManyField(
+        'users.User',
+        blank=True,
+        related_name='friends'
+    )
+
     followers = models.ManyToManyField(
         'users.User',
         blank=True,
