@@ -6,26 +6,24 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Models
-from posts.models import Post, ReactionComment, ReactionPost
+from posts.models import Post, ReactionPost
 
 # Serializers
 from posts.serializers import (PostModelSerializer,
-                               ReactionPostModelSerializer, 
+                               ReactionPostModelSerializer,
                                ReactionPostModelSummarySerializer)
-
 
 class PostViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
-    """Post view set.
-
-        Handle list, create, update and destroy post."""
+    """ Post view set.
+        Handle list, create, update and destroy post.
+    """
 
     queryset = Post.objects.all()
     serializer_class = PostModelSerializer
-    lookup_field = 'id'
 
     @action(detail=False, methods=['post'])
     def create_post(self, request):
@@ -41,14 +39,15 @@ class PostViewSet(mixins.ListModelMixin,
     
     @action(detail=True, methods=['post'])
     def react(self, request, *args, **kwargs):
-        """Create a reaction."""
+        """Create a post's reaction."""
         post = self.get_object()
         serializer = ReactionPostModelSerializer(
             data=request.data,
             context={
                 'user': request.user,
                 'post': post
-            })
+            }
+        )
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -63,7 +62,9 @@ class PostViewSet(mixins.ListModelMixin,
     @action(detail=True, methods=['get'])
     def reactions(self, request, *args, **kwargs):
         """List all post's reactions."""
-        reactions = ReactionPost.objects.all()
+        post = self.get_object()
+        reactions = ReactionPost.objects.filter(post=post)
         serializer = ReactionPostModelSummarySerializer(reactions, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
+                

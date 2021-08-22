@@ -1,3 +1,3 @@
-from .posts import PostModelSerializer
-from .reactions import ReactionPostModelSerializer, ReactionCommentModelSerializer, ReactionPostModelSummarySerializer
-from .comments import CommentModelSerializer
+from .posts import *
+from .reactions import *
+from .comments import *

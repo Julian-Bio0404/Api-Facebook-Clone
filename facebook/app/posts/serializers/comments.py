@@ -25,7 +25,8 @@ class CommentModelSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, data):
-        """Create a post."""
+        """Create a comment."""
+        # comment
         user = self.context['user']
         profile = user.profile
         post = self.context['post']
@@ -36,4 +37,8 @@ class CommentModelSerializer(serializers.ModelSerializer):
             post=post
         )
         comment.save()
+
+        # Post
+        post.comments += 1
+        post.save()
         return comment

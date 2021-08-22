@@ -98,8 +98,27 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
             'user', 'comment'
         ]
 
+    def validate(self, data):
+        """Velidate.
+        verify that the user's reaction does not exist yet
+        """
+        try:
+            user = self.context['user']
+            reaction = ReactionComment.objects.get(
+                user=user
+            )
+            # Si la reaccion del usuario existe, esta se elimina
+            reaction.delete()
+            comment = self.context['comment']
+            comment.reactions -= 1
+            comment.save()
+        except ReactionComment.DoesNotExist:
+            # Si no existe, procede a crearse
+            return data
+
     def create(self, data):
         """Create a reaction comment."""
+        # Reaction comment
         user = self.context['user']
         comment = self.context['comment']
         reaction_comment = ReactionComment.objects.create(
@@ -109,5 +128,23 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
             comment=comment
         )
         reaction_comment.save()
+
+        # Comment
+        comment.reactions += 1
+        comment.save()
         return reaction_comment
-        
+
+
+class ReactionCommentModelSummarySerializer(ReactionCommentModelSerializer):
+    """Reaction comment model summary serializer"""
+    
+    class Meta:
+        """Meta options."""
+        model = ReactionComment
+        fields = [
+            'user', 'reaction'
+        ]
+
+        read_only_fields = [
+            'user', 'comment'
+        ]
