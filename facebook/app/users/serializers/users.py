@@ -10,17 +10,17 @@ from django.utils import timezone
 
 # Django REST Framework
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
+from rest_framework.validators import UniqueValidator
 
 # Models
-from users.models import Profile, User, ProfileDetail
+from users.models import Profile, ProfileDetail, User
 
 # Serializers
 from .profiles import ProfileModelSerializer, ProfileModelSummarySerializer
 
 # Utilities
-from datetime import timedelta 
+from datetime import timedelta
 import jwt
 
 
@@ -47,6 +47,7 @@ class UserModelSerializer(serializers.ModelSerializer):
             'is_verified'
         ]
 
+
 class UserModelSummarySerializer(UserModelSerializer):
     """User model data summary serializer."""
 
@@ -63,8 +64,9 @@ class UserModelSummarySerializer(UserModelSerializer):
 
 
 class UserSignUpSerializer(serializers.Serializer):
-    """User signup serializer.
-    Handle sign up data validation and user & profile creation."""
+    """ User signup serializer.
+        Handle sign up data validation and user & profile creation.
+    """
 
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())]
@@ -75,7 +77,7 @@ class UserSignUpSerializer(serializers.Serializer):
         max_length=25,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    
+
     # Phone number
     phone_regex = RegexValidator(
         regex=r"^\+1?\d{1,4}[ ]\d{10}$",
@@ -93,8 +95,6 @@ class UserSignUpSerializer(serializers.Serializer):
 
     def validate(self, data):
         """Verify password match and type identification."""
-
-        # Password
         passwd = data['password']
         passwd_conf = data['password_confirmation']
         if passwd != passwd_conf:
@@ -132,14 +132,16 @@ class UserSignUpSerializer(serializers.Serializer):
             'account_verification.html',
             {'token': verification_token, 'user': user}
         )
-        msg = EmailMultiAlternatives(subject, content, from_email, [user.email])
+        msg = EmailMultiAlternatives(
+            subject, content, from_email, [user.email])
         msg.attach_alternative(content, 'text/html')
         msg.send()
 
 
 class UserLoginSerializer(serializers.Serializer):
-    """User login serializer.
-        handle the login request data."""
+    """ User login serializer.
+        handle the login request data.
+    """
     
     email = serializers.EmailField()
     password = serializers.CharField(min_length=8, max_length=64)
@@ -183,4 +185,65 @@ class AccountVerificationSerializer(serializers.Serializer):
         payload = self.context['payload']
         user = User.objects.get(username=payload['user'])
         user.is_verified = True
+        user.save()
+
+
+class RestorePasswordSerializer(serializers.Serializer):
+    """Restore user's password serializer."""
+
+    password = serializers.CharField(
+        required=True, min_length=8, max_length=64)
+        
+    password_confirmation = serializers.CharField(
+        required=True, min_length=8, max_length=64)
+    
+    token = serializers.CharField()
+
+    def validate_token(self, data):
+        """Verify token is valid."""
+        try:
+            payload = jwt.decode(data, settings.SECRET_KEY, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise serializers.ValidationError('Verification link has expired.')
+        except jwt.PyJWTError:
+            raise serializers.ValidationError('Invalid token')
+        if payload['type'] != 'restore_password':
+            raise serializers.ValidationError('Invalid token')
+        self.context['payload'] = payload
+        return data
+
+    def save(self):
+        """Update user's verified status."""
+        payload = self.context['payload']
+        user = User.objects.get(username=payload['user'])
+        user.set_password(self.validated_data['password'])
+        user.save()
+
+
+class UpdatePasswordSerializer(serializers.Serializer):
+    """Update user's password serializer."""
+
+    old_password = serializers.CharField(
+        required=True, min_length=8, max_length=64)
+
+    password = serializers.CharField(
+        required=True, min_length=8, max_length=64)
+        
+    password_confirmation = serializers.CharField(
+        required=True, min_length=8, max_length=64)
+
+    def validate(self, data):
+        """Check password."""
+        if not self.context['user'].check_password(data['old_password']):
+            raise serializers.ValidationError('Wrong password.')
+
+        if data['password_confirmation'] != data['password']:
+            raise serializers.ValidationError('Password don´t match')
+        password_validation.validate_password(data['password'])
+        return data
+
+    def save(self):
+        """Update user's password."""
+        user = self.context['user']
+        user.set_password(self.validated_data['password'])
         user.save()

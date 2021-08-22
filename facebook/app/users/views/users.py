@@ -17,11 +17,13 @@ from users.models import User
 
 # Serializers
 from users.serializers import (AccountVerificationSerializer,
+                               UpdatePasswordSerializer,
                                UserLoginSerializer, 
                                UserModelSerializer,
-                               UserSignUpSerializer)
+                               UserSignUpSerializer,
+                               RestorePasswordSerializer)
 
-# Utils
+# Utilities
 from datetime import timedelta
 import jwt
 
@@ -100,3 +102,48 @@ class UserViewSet(mixins.ListModelMixin,
                 'message': 'We send you an new account verification message to your email.'
             }
             return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def token_restore_password(self, request):
+        """Create a token for restore password."""
+        user = User.objects.get(email=request.data['email'])
+        exp_date = timezone.now() + timedelta(minutes=20)
+        payload = {
+            'user': user.username,
+            'exp': int(exp_date.timestamp()),
+            'type': 'restore_password'
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        subject = 'Update your password'
+        from_email = 'Facebook <Facebook.com>'
+        content = render_to_string(
+            'restore_password.html',
+            {'token': token, 'user': user})
+        msg = EmailMultiAlternatives(
+            subject, content, from_email, [user.email])
+        msg.attach_alternative(content, 'text/html')
+        msg.send()
+        data = {
+            'message': 'We have sent an email for you to reset your password.'
+            }
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def restore_password(self, request):
+        """Restore user's password."""
+        serializer = RestorePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = {
+            'message': 'Your password has been reset.'
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['put'])
+    def update_password(self, request, *args, **kwargs):
+        """Update user's password."""
+        serializer = UpdatePasswordSerializer(
+            data=request.data, context={'user': request.user})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
