@@ -34,6 +34,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'hobby',
             'birth_date',
             'origin_country',
+            'friends',
             'followers',
             'following',
             'profiledetail'
@@ -44,6 +45,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'following'
             'profiledetail',
         ]
+        
 
 class ProfileModelSummarySerializer(ProfileModelSerializer):
     """Profile model data summary serializer."""

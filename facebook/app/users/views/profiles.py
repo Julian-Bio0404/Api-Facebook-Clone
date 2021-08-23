@@ -12,17 +12,18 @@ from posts.models import Post
 # Serializers
 from posts.serializers import PostModelSerializer
 from users.serializers import (ProfileDetailModelSerializer,
-                               ProfileModelSerializer)
+                               ProfileModelSerializer,
+                               UserModelSummarySerializer)
 
 
 class ProfileViewSet(mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.UpdateModelMixin,
                      viewsets.GenericViewSet):
-    """Profile view set.
-
-        Handle list profile, update profile 
-        and update profile details."""
+    """ Profile view set.
+        Handle list profile, update profile, 
+        update profile details and list friends.
+    """
 
     queryset = Profile.objects.all()
     serializer_class = ProfileModelSerializer
@@ -52,5 +53,14 @@ class ProfileViewSet(mixins.ListModelMixin,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def friends(self, request, *args, **kwargs):
+        """List all friends."""
+        profile = self.get_object()
+        friends = profile.friends
+        serializer = UserModelSummarySerializer(friends, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
