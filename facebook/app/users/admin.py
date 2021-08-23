@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 # Models
-from users.models import User, Profile, ProfileDetail
+from users.models import FriendRequest, User, Profile, ProfileDetail
 
 
 @admin.register(User)
@@ -57,3 +57,17 @@ class ProfileDetailAdmin(admin.ModelAdmin):
 
     search_fields = ['current_city']
     ordering = ['user__first_name', 'user__last_name']
+
+
+@admin.register(FriendRequest)
+class FriendRequestAdmin(admin.ModelAdmin):
+    """Friend request model admin."""
+
+    list_display = [
+        'requesting_user', 'requested_user',
+        'accepted'
+    ]
+
+    search_fields = ['requested_user']
+    ordering = ['-created']
+    
