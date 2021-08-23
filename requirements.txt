@@ -14,7 +14,7 @@ djangorestframework==3.12.4
 PyJWT==2.1.0
 
 # Django Filter
- django-filter==2.4.0
+django-filter==2.4.0
 
 # Celery
 amqp==5.0.6

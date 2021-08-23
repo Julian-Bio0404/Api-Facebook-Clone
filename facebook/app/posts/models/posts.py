@@ -25,6 +25,12 @@ class Post(FbModel):
         blank=True, null=True
     )
 
+    video = models.FileField(
+        help_text='post video',
+        upload_to='posts/videos/',
+        blank=True, null=True
+    )
+
     # post privacy choices
     POST_PRIVACY = [
         ('PUBLIC', 'Public'),
@@ -49,7 +55,8 @@ class Post(FbModel):
         ('ALONE', 'alone'), ('ANGRY', 'angry'),
         ('SORRY', 'sorry'), ('CONFUSED', 'confused'),
         ('STRONG', 'strong'), ('STRESSED', 'stressed'),
-        ('SCARED', 'scared')
+        ('SCARED', 'scared'), ('SICK', 'sick'),
+        ('SARCASTIC', 'sarcastic'), ('ANXIOUS', 'anxious')
     ]
 
     feeling = models.CharField(

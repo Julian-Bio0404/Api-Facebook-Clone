@@ -20,7 +20,7 @@ class PostModelSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             'user','about', 'picture',
-            'privacy', 'feeling',
+            'video', 'privacy', 'feeling',
             'location', 'tag_friends',
             'reactions', 'destination'
         ]
@@ -28,6 +28,19 @@ class PostModelSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'user', 'reactions'
         ]
+
+    def validate(self, data):
+        """Verify that about, picture or video are present."""
+        media = ['picture', 'video', 'about']
+        match = False
+        for i in media:
+            if i in data:
+                match = True
+                break
+        if match == False:
+            raise serializers.ValidationError(
+                'You must include an about, picture or video.')
+        return data
 
     def create(self, data):
         """Create a post."""
