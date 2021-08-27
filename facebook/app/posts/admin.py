@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from posts.models import Comment, Post, ReactionComment, ReactionPost
+from posts.models import CategorySaved, Comment, Post, ReactionComment, ReactionPost, Saved
 
 
 @admin.register(Post)
@@ -70,3 +70,23 @@ class ReactionCommentAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['comment']
+
+
+@admin.register(CategorySaved)
+class CategorySavedAdmin(admin.ModelAdmin):
+    """Category Saved model admin."""
+
+    list_display = [
+        'user', 'name'
+    ]
+
+
+@admin.register(Saved)
+class SavedAdmin(admin.ModelAdmin):
+    """Saved model admin."""
+
+    list_display = [
+        'user', 'post'
+    ]
+
+    list_filter = ['user']
