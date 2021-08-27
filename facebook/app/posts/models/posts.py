@@ -2,6 +2,7 @@
 
 # Django
 from django.db import models
+from django.db.models.base import Model
 
 # Utilities
 from utils.models import FbModel
@@ -94,6 +95,12 @@ class Post(FbModel):
         max_length=9,
         choices=TYPE_DESTINATION,
         default='BIOGRAPHY'
+    )
+
+    name_destination = models.CharField(
+        help_text="name of post's destination",
+        max_length=60,
+        blank=True
     )
 
     def __str__(self):

@@ -7,9 +7,11 @@ from rest_framework.response import Response
 
 # Serializers
 from groups.serializers import GroupModelSerializer
+from posts.serializers import PostModelSerializer
 
 # Models
 from groups.models import Group, Membership
+from posts.models import Post
 
 
 class GroupeViewSet(mixins.CreateModelMixin,
@@ -41,3 +43,12 @@ class GroupeViewSet(mixins.CreateModelMixin,
             group=group,
             is_admin=True,
         )
+    
+    @action(detail=True, methods=['get'])
+    def posts(self, request, *args, **kwargs):
+        """List all grop's a posts."""
+        group = self.get_object()
+        posts = Post.objects.filter(
+            destination='GROUP', name_destination=group.name)
+        data = PostModelSerializer(posts, many=True).data
+        return Response(data, status=status.HTTP_200_OK)

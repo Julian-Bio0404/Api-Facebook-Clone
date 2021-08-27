@@ -22,7 +22,8 @@ class PostModelSerializer(serializers.ModelSerializer):
             'user','about', 'picture',
             'video', 'privacy', 'feeling',
             'location', 'tag_friends',
-            'reactions', 'destination'
+            'reactions', 'destination',
+            'name_destination'
         ]
 
         read_only_fields = [

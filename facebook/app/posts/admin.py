@@ -12,9 +12,11 @@ class PostAdmin(admin.ModelAdmin):
     """Post model admin."""
 
     list_display = [
-        'pk','user', 'destination','about', 'privacy', 
-        'feeling', 'location', 'tag_friends', 
-        'reactions', 'comments', 'created'
+        'pk','user', 'destination',
+        'name_destination','about', 
+        'privacy', 'feeling', 'location', 
+        'tag_friends', 'reactions', 
+        'comments', 'created'
     ]
 
     search_fields = [
