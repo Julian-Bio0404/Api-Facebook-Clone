@@ -44,5 +44,5 @@ class Invitation(FbModel):
     objects = InvitationManager()
     
     def __str__(self):
-        """Return code and circle."""
+        """Return code and group."""
         return "#{}: {}".format(self.group.slug_name, self.code)

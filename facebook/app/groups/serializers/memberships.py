@@ -18,11 +18,10 @@ class MembershipModelSerializer(serializers.ModelSerializer):
 
     user = UserModelSerializer(read_only=True)
     invited_by = serializers.StringRelatedField()
-    joined_at = serializers.DateTimeField(source="created", read_only=True)
+    joined_at = serializers.DateTimeField(source='created', read_only=True)
 
     class Meta:
         """Meta options."""
-
         model = Membership
         fields = [
             'user', 'is_admin',
@@ -35,7 +34,6 @@ class MembershipModelSerializer(serializers.ModelSerializer):
 class AddMemberSerializer(serializers.Serializer):
     """ Add member serializer.
         Handle the addition of a new member to a group.
-        Group object must be provided in the context.
     """
 
     invitation_code = serializers.CharField(min_length=8)
@@ -67,7 +65,7 @@ class AddMemberSerializer(serializers.Serializer):
         """Create new group's member."""
         group = self.context['group']
         invitation = self.context['invitation']
-        user = data['user']
+        user = self.context['user']
         now = timezone.now()
 
         # Member creation

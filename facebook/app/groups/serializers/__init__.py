@@ -1,2 +1,2 @@
 from .groups import *
-from .membership import *
+from .memberships import *
