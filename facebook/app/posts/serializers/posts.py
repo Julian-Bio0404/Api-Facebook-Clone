@@ -50,3 +50,38 @@ class PostModelSerializer(serializers.ModelSerializer):
         post = Post.objects.create(**data, user=user, profile=profile)
         post.save()
         return post
+
+
+class CreatePagePostModelSerializer(PostModelSerializer):
+    """Create Page Post model serializer."""
+
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        """Meta options."""
+        model = Post
+        fields = [
+            'user','about', 'picture',
+            'video', 'privacy', 'feeling',
+            'location','reactions', 'destination',
+            'name_destination'
+        ]
+
+        read_only_fields = [
+            'user', 'reactions', 
+            'privacy', 'destination'
+            'name_destination'
+        ]
+
+    def create(self, data):
+        """Create a post."""
+        user = self.context['user']
+        profile = user.profile
+        post = Post.objects.create(
+            **data, user=user, 
+            profile=profile, 
+            privacy=self.context['privacy'],
+            destination=self.context['destination'], 
+            name_destination=self.context['name_destination'])
+        post.save()
+        return post
