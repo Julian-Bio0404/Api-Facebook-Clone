@@ -4,16 +4,16 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from users.serializers import UserModelSummarySerializer
 
 # Serializers
 from fbpages.serializers import PageModelSerializer
-from posts.models import Post
 from posts.serializers import (CreatePagePostModelSerializer,
                                PostModelSerializer)
+from users.serializers import UserModelSummarySerializer
 
 # Models
 from fbpages.models import Page
+from posts.models import Post
 
 
 class PageViewSet(mixins.CreateModelMixin,

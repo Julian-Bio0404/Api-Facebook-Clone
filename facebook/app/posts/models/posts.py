@@ -102,6 +102,13 @@ class Post(FbModel):
         blank=True
     )
 
+    re_post = models.ForeignKey(
+        'self', 
+        help_text='post to be republished',
+        null=True, 
+        on_delete=models.SET_NULL
+    )
+
     def __str__(self):
         """Return about and username"""
         return "{} by @{}".format(self.about, self.user.username)

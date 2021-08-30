@@ -1,6 +1,7 @@
 """Posts serializers."""
 
 # Django REST Framework
+from os import read
 from rest_framework import serializers
 
 # Models
@@ -10,8 +11,8 @@ from posts.models import Post
 from users.serializers import UserModelSummarySerializer
 
 
-class PostModelSerializer(serializers.ModelSerializer):
-    """Post model serializer."""
+class SharedPostModelSerializer(serializers.ModelSerializer):
+    """Shared post model serializer."""
 
     user = UserModelSummarySerializer(read_only=True)
 
@@ -22,33 +23,64 @@ class PostModelSerializer(serializers.ModelSerializer):
             'user','about', 'picture',
             'video', 'privacy', 'feeling',
             'location', 'tag_friends',
-            'reactions', 'destination',
-            'name_destination'
+            'reactions'
         ]
 
         read_only_fields = [
             'user', 'reactions'
         ]
 
+
+class PostModelSerializer(serializers.ModelSerializer):
+    """Post model serializer."""
+
+    user = UserModelSummarySerializer(read_only=True)
+    re_post = SharedPostModelSerializer(read_only=True)
+
+    class Meta:
+        """Meta options."""
+        model = Post
+        fields = [
+            'user','about', 'picture',
+            'video', 'privacy', 'feeling',
+            'location', 'tag_friends',
+            'reactions', 'destination',
+            'name_destination', 're_post'
+        ]
+
+        read_only_fields = [
+            'user', 'reactions', 
+            're_post'
+        ]
+
     def validate(self, data):
         """Verify that about, picture or video are present."""
-        media = ['picture', 'video', 'about']
-        match = False
-        for i in media:
-            if i in data:
-                match = True
-                break
-        if match == False:
-            raise serializers.ValidationError(
-                'You must include an about, picture or video.')
-        return data
+        if self.context['post']:
+            return data
+        else:
+            media = ['picture', 'video', 'about']
+            match = False
+            for i in media:
+                if i in data:
+                    match = True
+                    break
+            if match == False:
+                raise serializers.ValidationError(
+                    'You must include an about, picture or video.')
+            return data
 
     def create(self, data):
         """Create a post."""
         user = self.context['user']
         profile = user.profile
-        post = Post.objects.create(**data, user=user, profile=profile)
-        post.save()
+        if self.context['post']:
+            post = Post.objects.create(
+                **data, user=user, 
+                profile=profile, 
+                re_post=self.context['post'])
+        else:
+            post = Post.objects.create(**data, user=user, profile=profile)
+            post.save()
         return post
 
 
