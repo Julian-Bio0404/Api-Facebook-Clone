@@ -1,11 +1,10 @@
 """Posts serializers."""
 
 # Django REST Framework
-from os import read
 from rest_framework import serializers
 
 # Models
-from posts.models import Post
+from posts.models import Post, Shared
 
 # Serializers
 from users.serializers import UserModelSummarySerializer
@@ -117,3 +116,21 @@ class CreatePagePostModelSerializer(PostModelSerializer):
             name_destination=self.context['name_destination'])
         post.save()
         return post
+
+
+class SharedModelSerializer(serializers.ModelSerializer):
+    """Shared model serializer."""
+
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        """Meta options."""
+        model = Shared
+        fields = [
+            'user', 'about', 
+            'post'
+        ]
+
+        read_only_fields = [
+            'user', 'post'
+        ]

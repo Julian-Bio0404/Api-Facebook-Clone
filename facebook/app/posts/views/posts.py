@@ -70,7 +70,7 @@ class PostViewSet(mixins.CreateModelMixin,
         return Response(data, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
-    def shared(self, request, *args, **kwargs):
+    def share(self, request, *args, **kwargs):
         """Handles share post."""
         post = self.get_object()
         serializer = PostModelSerializer(

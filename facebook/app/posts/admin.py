@@ -4,7 +4,11 @@
 from django.contrib import admin
 
 # Models
-from posts.models import CategorySaved, Comment, Post, ReactionComment, ReactionPost, Saved
+from posts.models import (CategorySaved,
+                          Comment, Post,
+                          ReactionComment,
+                          ReactionPost,
+                          Saved, Shared)
 
 
 @admin.register(Post)
@@ -16,7 +20,7 @@ class PostAdmin(admin.ModelAdmin):
         'name_destination','about', 
         'privacy', 'feeling', 'location', 
         'tag_friends', 'reactions', 
-        'comments', 'created'
+        'comments', 're_post', 'created'
     ]
 
     search_fields = [
@@ -70,6 +74,17 @@ class ReactionCommentAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['comment']
+
+
+@admin.register(Shared)
+class SharedAdmin(admin.ModelAdmin):
+    """Shared model admin."""
+
+    list_display = [
+        'user', 'about', 'post'
+    ]
+
+    list_filter = ['post']
 
 
 @admin.register(CategorySaved)
