@@ -20,8 +20,9 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
                            mixins.RetrieveModelMixin,
                            mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    """ Friend request view set.
-        Handle the sending, acceptance and list of friend requests.
+    """Friend request view set.
+
+    Handle the sending, acceptance and list of friend requests.
     """
 
     serializer_class = ProfileModelSerializer
@@ -38,43 +39,34 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
         return friend_request
 
     def create(self, request, *args, **kwargs):
-        """Send a friend's request."""
+        """handles the sending of friend requests."""
         serializer = FriendRequestModelSerializer(
             data=request.data,
-            context={
-                'requesting_user': request.user,
-                'requested_user': self.user
-            }
-        )
+            context={'requesting_user': request.user, 'requested_user': self.user})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = serializer.data
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, *args, **kwargs):
         """Friend request details."""
         friend_request = self.get_object()
         serializer = FriendRequestModelSerializer(friend_request)
-        data = serializer.data
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def list(self, request, *args, **kwargs):
         """List all user's friend request."""
-        friend_requests = FriendRequest.objects.filter(requested_user=self.user)
+        friend_requests = FriendRequest.objects.filter(
+            requested_user=self.user)
         serializer = FriendRequestModelSerializer(friend_requests, many=True)
-        data = serializer.data
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def confirm(self, request, *args, **kwargs):
-        """Accept a friend request."""
+        """Handle the confirmation of friend request."""
         friend_request = self.get_object()
         serializer = AcceptFriendRequestSerializer(
-            data=request.data,
-            context={'friend_request': friend_request}
-        )
+            data=request.data, context={'friend_request': friend_request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = FriendRequestModelSerializer(friend_request).data
         return Response(data, status=status.HTTP_200_OK)
-

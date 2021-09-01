@@ -12,7 +12,6 @@ class ReactionPost(FbModel):
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     profile = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
-
     post = models.ForeignKey('posts.Post', on_delete=models.CASCADE)
 
     # Reaction choices
@@ -41,7 +40,6 @@ class ReactionComment(FbModel):
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     profile = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
-
     comment = models.ForeignKey('posts.Comment', on_delete=models.CASCADE)
 
     # Reaction choices
@@ -52,14 +50,10 @@ class ReactionComment(FbModel):
     ]
 
     reaction = models.CharField(
-        help_text='react to a comment', 
-        max_length=5, 
-        choices=REACTIONS
-    )
+        help_text='react to a comment', max_length=5, choices=REACTIONS)
 
     def __str__(self):
         """Return user, post and reaction."""
         return '@{} reacted to your comment {}'.format(
             self.user.username, 
-            self.comment.text
-        )
+            self.comment.text)

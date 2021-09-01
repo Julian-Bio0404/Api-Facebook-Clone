@@ -18,20 +18,14 @@ class CategorySaved(FbModel):
         return self.name
 
 
-
 class Saved(FbModel):
-    """ Saved model.
-        Save a post.
-    """
+    """ Saved model."""
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     post = models.ForeignKey('posts.Post', on_delete=models.CASCADE)
 
     saved_category = models.ForeignKey(
-        'CategorySaved', 
-        on_delete=models.SET_NULL, 
-        null=True
-    )
+        'CategorySaved', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         """Return post saved."""

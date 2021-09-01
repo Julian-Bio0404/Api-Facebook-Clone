@@ -22,18 +22,13 @@ class Invitation(FbModel):
     code = models.CharField(max_length=50, unique=True)
 
     sent_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        help_text='Group member that is providing the invitation',
-    )
+        'users.User', on_delete=models.CASCADE,
+        help_text='Group member that is providing the invitation')
 
     used_by = models.ForeignKey(
-        'users.User',
-        on_delete=models.CASCADE,
-        null=True,
+        'users.User', on_delete=models.CASCADE,
         help_text='User that used the code to enter the group',
-        related_name='used_by'
-    )
+        null=True, related_name='used_by')
 
     group = models.ForeignKey('groups.Group', on_delete=models.CASCADE)
 

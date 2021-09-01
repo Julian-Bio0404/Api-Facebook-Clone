@@ -1,1 +1,1 @@
-from .notifications import Notification
+from .notifications import *

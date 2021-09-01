@@ -15,8 +15,7 @@ class FriendRequest(FbModel):
     requested_user = models.ForeignKey(
         'users.User', 
         on_delete=models.CASCADE, 
-        related_name='requested_user'
-    )
+        related_name='requested_user')
 
     accepted = models.BooleanField(default=False)
 
@@ -24,5 +23,4 @@ class FriendRequest(FbModel):
         """Return requesting_user and requested_user."""
         return 'from @{} to @{}'.format(
             self.requesting_user.username,
-            self.requested_user.username
-        )
+            self.requested_user.username)

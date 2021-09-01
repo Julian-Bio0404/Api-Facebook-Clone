@@ -1,3 +1,3 @@
-from .users import User
-from .profiles import Profile, ProfileDetail
-from .friend_requests import FriendRequest
+from .friend_requests import *
+from .profiles import *
+from .users import *

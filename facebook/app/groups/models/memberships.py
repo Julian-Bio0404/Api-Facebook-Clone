@@ -19,20 +19,16 @@ class Membership(FbModel):
     group = models.ForeignKey("groups.Group", on_delete=models.CASCADE)
 
     is_admin = models.BooleanField(
-        default=False,
-        help_text='Group admin can have action on a group.'
-    )
+        default=False, help_text='Group admin can have action on a group.')
 
     invited_by = models.ForeignKey(
-        "users.User",
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='invited_by'
-    )
+        "users.User", on_delete=models.SET_NULL,
+        null=True, related_name='invited_by')
+
+    is_active = models.BooleanField(
+        default=False, 
+        help_text='Only active users are allowed to interact in the group.')
 
     def __str__(self):
         """Return username and slugname."""
-        return "@{} at #{}".format(
-            self.user.username,
-            self.group.slug_name
-        )
+        return "@{} at #{}".format(self.user.username, self.group.slug_name)

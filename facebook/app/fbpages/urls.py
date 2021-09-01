@@ -7,7 +7,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 #Views
-from .views.pages import PageViewSet
+from .views import PageViewSet
 
 
 router = DefaultRouter()

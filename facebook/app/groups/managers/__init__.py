@@ -1,1 +1,1 @@
-from .invitations import InvitationManager
+from .invitations import *

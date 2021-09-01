@@ -7,7 +7,7 @@ from rest_framework import serializers
 from users.models import FriendRequest
 
 # Serializers
-from users.serializers import UserModelSummarySerializer
+from .users import UserModelSummarySerializer
 
 
 class FriendRequestModelSerializer(serializers.ModelSerializer):
@@ -32,7 +32,7 @@ class FriendRequestModelSerializer(serializers.ModelSerializer):
         ]
     
     def validate(self, data):
-        """Verify that friend request """
+        """Verify friend request """
         requesting_user = self.context['requesting_user']
         requested_user = self.context['requested_user']
 
@@ -43,7 +43,6 @@ class FriendRequestModelSerializer(serializers.ModelSerializer):
             friend_request = FriendRequest.objects.get(
                 requesting_user=requesting_user, 
                 requested_user=requested_user)
-
             if friend_request:
                 raise serializers.ValidationError(
                     'You already sent a friend request.')

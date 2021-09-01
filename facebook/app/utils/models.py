@@ -14,16 +14,12 @@ class FbModel(models.Model):
         + modified (Datetime): Store the last datetime the object was modified."""
 
     created = models.DateTimeField(
-        'created at', 
-        auto_now_add=True,
-        help_text='Date time on which the was created'
-    )
+        'created at', auto_now_add=True,
+        help_text='Date time on which the was created')
 
     modified = models.DateTimeField(
-        'modified at', 
-        auto_now=True,
-        help_text='Date time on which the was las modified.'
-    )
+        'modified at', auto_now=True,
+        help_text='Date time on which the was las modified.')
 
     class Meta:
         """Meta option."""

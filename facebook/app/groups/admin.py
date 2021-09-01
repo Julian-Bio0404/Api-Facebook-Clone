@@ -26,11 +26,12 @@ class MembershipAdmin(admin.ModelAdmin):
 
     list_display = [
         'user', 'group', 
-        'is_admin', 'invited_by'
+        'is_admin', 'invited_by',
+        'is_active'
     ]
 
     search_fields = ['user', 'group']
-    list_filter = ['group']
+    list_filter = ['group', 'is_active']
 
 
 @admin.register(Invitation)

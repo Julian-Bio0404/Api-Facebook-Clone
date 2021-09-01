@@ -23,12 +23,12 @@ class GroupeViewSet(mixins.CreateModelMixin,
     """ Group view set."""
 
     serializer_class = GroupModelSerializer
-    lookup_field = "slug_name"
+    lookup_field = 'slug_name'
 
     def get_queryset(self):
         """Restrict list to public-only."""
         queryset = Group.objects.all()
-        if self.action == "list":
+        if self.action == 'list':
             return queryset.filter(is_public=True)
         return queryset
 
@@ -38,11 +38,8 @@ class GroupeViewSet(mixins.CreateModelMixin,
         user = self.request.user
         profile = user.profile
         Membership.objects.create(
-            user=user,
-            profile=profile,
-            group=group,
-            is_admin=True,
-        )
+            user=user, profile=profile, group=group, 
+            is_admin=True, is_active=True)
     
     @action(detail=True, methods=['get'])
     def posts(self, request, *args, **kwargs):

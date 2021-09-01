@@ -18,34 +18,26 @@ class Group(FbModel):
 
     slug_name = models.SlugField(
         help_text='slug name', 
-        unique=True, 
-        max_length=60
-    )
+        unique=True, max_length=60)
 
     about = models.CharField(
-        help_text='circle description',
-        max_length=200,
-        blank=True
-    )
+        help_text='group description',
+        max_length=200, blank=True)
 
     cover_photo = models.ImageField(
         help_text='group picture', 
         upload_to='groups/pictures/', 
-        blank=True, 
-        null=True 
-    )
+        blank=True, null=True)
 
     members = models.ManyToManyField(
-        "users.User",
+        'users.User',
         through='groups.Membership',
-        through_fields=('group', 'user')
-    )
+        through_fields=('group', 'user'))
 
     is_public = models.BooleanField(
         default=True,
-        help_text='public groups can be found by other users'
-    )
+        help_text='Public groups can be found by other users')
 
     def __str__(self):
-        """Return group name"""
+        """Return group name."""
         return self.name

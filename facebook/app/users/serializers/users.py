@@ -1,5 +1,9 @@
 """Users serializers."""
 
+# Utilities
+from datetime import timedelta
+import jwt
+
 # Django
 from django.conf import settings
 from django.contrib.auth import authenticate, password_validation
@@ -19,10 +23,6 @@ from users.models import Profile, ProfileDetail, User
 # Serializers
 from .profiles import ProfileModelSerializer, ProfileModelSummarySerializer
 
-# Utilities
-from datetime import timedelta
-import jwt
-
 
 class UserModelSerializer(serializers.ModelSerializer):
     """User model serializer."""
@@ -32,7 +32,7 @@ class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta options."""
         model = User
-        fields = (
+        fields = [
             'username',
             'first_name',
             'last_name',
@@ -40,7 +40,7 @@ class UserModelSerializer(serializers.ModelSerializer):
             'phone_number',
             'profile',
             'is_verified'
-        )
+        ]
 
         read_only_fields = [
             'profile',
@@ -64,8 +64,9 @@ class UserModelSummarySerializer(UserModelSerializer):
 
 
 class UserSignUpSerializer(serializers.Serializer):
-    """ User signup serializer.
-        Handle sign up data validation and user & profile creation.
+    """User signup serializer.
+
+    Handle sign up data validation and user & profile creation.
     """
 
     email = serializers.EmailField(
@@ -73,16 +74,14 @@ class UserSignUpSerializer(serializers.Serializer):
     )
 
     username = serializers.CharField(
-        min_length=4,
-        max_length=25,
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
+        min_length=4, max_length=25,
+        validators=[UniqueValidator(queryset=User.objects.all())])
 
     # Phone number
     phone_regex = RegexValidator(
         regex=r"^\+1?\d{1,4}[ ]\d{10}$",
-        message='Phone number must be entered in the format: +99 9999999999. Up to indicative + 10 digits allowed.'
-    )
+        message='Phone number must be entered in the format: +99 9999999999. Up to indicative + 10 digits allowed.')
+
     phone_number = serializers.CharField(validators=[phone_regex])
 
     # Password
@@ -97,6 +96,7 @@ class UserSignUpSerializer(serializers.Serializer):
         """Verify password match and type identification."""
         passwd = data['password']
         passwd_conf = data['password_confirmation']
+        
         if passwd != passwd_conf:
             raise serializers.ValidationError('Password don´t match')
         password_validation.validate_password(passwd)
@@ -130,8 +130,7 @@ class UserSignUpSerializer(serializers.Serializer):
         from_email = 'Facebook <Facebook.com>'
         content = render_to_string(
             'account_verification.html',
-            {'token': verification_token, 'user': user}
-        )
+            {'token': verification_token, 'user': user})
         msg = EmailMultiAlternatives(
             subject, content, from_email, [user.email])
         msg.attach_alternative(content, 'text/html')
@@ -139,8 +138,9 @@ class UserSignUpSerializer(serializers.Serializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    """ User login serializer.
-        handle the login request data.
+    """User login serializer.
+
+    Handle the login request data.
     """
     
     email = serializers.EmailField()
@@ -151,6 +151,7 @@ class UserLoginSerializer(serializers.Serializer):
         user = authenticate(username=data['email'], password=data['password'])
         if not user:
             raise serializers.ValidationError('Invalid credentials.')
+
         if not user.is_verified:
             raise serializers.ValidationError('Account is not active yet.')
         self.context['user'] = user
@@ -170,11 +171,13 @@ class AccountVerificationSerializer(serializers.Serializer):
     def validate_token(self, data):
         """Verify token is valid."""
         try:
-            payload = jwt.decode(data, settings.SECRET_KEY, algorithms=['HS256'])
+            payload = jwt.decode(
+                data, settings.SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise serializers.ValidationError('Verification link has expired.')
         except jwt.PyJWTError:
             raise serializers.ValidationError('Invalid token')
+
         if payload['type'] != 'email_confirmation':
             raise serializers.ValidationError('Invalid token')
         self.context['payload'] = payload
@@ -202,11 +205,13 @@ class RestorePasswordSerializer(serializers.Serializer):
     def validate_token(self, data):
         """Verify token is valid."""
         try:
-            payload = jwt.decode(data, settings.SECRET_KEY, algorithms=['HS256'])
+            payload = jwt.decode(
+                data, settings.SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise serializers.ValidationError('Verification link has expired.')
         except jwt.PyJWTError:
             raise serializers.ValidationError('Invalid token')
+
         if payload['type'] != 'restore_password':
             raise serializers.ValidationError('Invalid token')
         self.context['payload'] = payload

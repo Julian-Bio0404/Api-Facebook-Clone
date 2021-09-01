@@ -21,6 +21,4 @@ class Comment(FbModel):
         """Return username, post title and comment."""
         return '@{} has commented {} on {}'.format(
             self.user.username, 
-            self.text, 
-            self.post
-        )
+            self.text, self.post)

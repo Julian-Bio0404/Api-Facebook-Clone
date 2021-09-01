@@ -34,22 +34,17 @@ class MembershipViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         """Return group members."""
-        return Membership.objects.filter(group=self.group)
+        return Membership.objects.filter(group=self.group, is_active=True)
 
     def get_object(self):
         """Return the group member by using the user's username."""
         return get_object_or_404(
-            Membership,
-            user__username=self.kwargs['pk'],
-            group=self.group,
-        )
+            Membership, user__username=self.kwargs['pk'], group=self.group)
 
     def create(self, request, *args, **kwargs):
         """Handle member creation from invitation code."""
         serializer = AddMemberSerializer(
-            data=request.data,
-            context={'group': self.group, 'request': request}
-        )
+            data=request.data, context={'group': self.group, 'request': request})
         serializer.is_valid(raise_exception=True)
         member = serializer.save()
         data = self.get_serializer(member).data
@@ -59,14 +54,13 @@ class MembershipViewSet(mixins.ListModelMixin,
     def invitations(self, request, *args, **kwargs):
         """Create a invitation."""
         username = request.data['username']
+
         try:
             guest_user = User.objects.get(username=username)
             invitation = Invitation.objects.create(
-            sent_by=request.user,
-            used_by=guest_user,
-            group=self.group).code
+                sent_by=request.user, used_by=guest_user, group=self.group).code
             data = {
-                'message': f'you invited {guest_user.username} to join the {self.group.slug_name} group.',
+                'message': f'You invited {guest_user.username} to join the {self.group.slug_name} group.',
                 'invitation code': invitation}
             return Response(data, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
@@ -77,6 +71,7 @@ class MembershipViewSet(mixins.ListModelMixin,
     def confirm_invitation(self, request, *args, **kwargs):
         """Confirm gropup's invitation."""
         code = request.data['invitation_code']
+
         try:
             # Invitation
             invitation = Invitation.objects.get(code=code)
@@ -84,16 +79,11 @@ class MembershipViewSet(mixins.ListModelMixin,
             invitation.used_at = timezone.now()
             invitation.save()
 
-            # Membership
-            membership = Membership.objects.create(
-                user=invitation.used_by,
-                profile = request.user.profile,
-                group = self.group,
-                invited_by = invitation.sent_by
-            )
-            # Group
-            self.group.members.add(membership.user)
-            self.group.save()
+            serializer = AddMemberSerializer(
+                data=request.data, 
+                context={'group': self.group, 'request': request, 'user': request.user })
+            serializer.is_valid(raise_exception=True)
+            membership = serializer.save()
             data = MembershipModelSerializer(membership).data
             return Response(data, status=status.HTTP_201_CREATED)
         except Invitation.DoesNotExist:

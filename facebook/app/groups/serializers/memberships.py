@@ -18,22 +18,23 @@ class MembershipModelSerializer(serializers.ModelSerializer):
 
     user = UserModelSerializer(read_only=True)
     invited_by = serializers.StringRelatedField()
-    joined_at = serializers.DateTimeField(source='created', read_only=True)
+    invited_at = serializers.DateTimeField(source='created', read_only=True)
 
     class Meta:
         """Meta options."""
         model = Membership
         fields = [
             'user', 'is_admin',
-            'invited_by', 'joined_at'
+            'invited_by', 'invited_at'
         ]
 
         read_only_fields = ['user']
 
 
 class AddMemberSerializer(serializers.Serializer):
-    """ Add member serializer.
-        Handle the addition of a new member to a group.
+    """Add member serializer.
+
+    Handle the addition of a new member to a group.
     """
 
     invitation_code = serializers.CharField(min_length=8)
@@ -44,8 +45,10 @@ class AddMemberSerializer(serializers.Serializer):
         group = self.context['group']
         user = data
         membership = Membership.objects.filter(group=group, user=user)
+
         if membership.exists():
-            raise serializers.ValidationError('User is already member of this group.')
+            raise serializers.ValidationError(
+                'User has already been invited to this group.')
         return data
 
     def validate_invitation_code(self, data):
@@ -54,31 +57,22 @@ class AddMemberSerializer(serializers.Serializer):
             invitation = Invitation.objects.get(
                 code=data,
                 group=self.context['group'],
-                used=False
-            )
+                used=True)
         except Invitation.DoesNotExist:
             raise serializers.ValidationError('Invalid invitation code.')
         self.context['invitation'] = invitation
         return data
 
     def create(self, data):
-        """Create new group's member."""
+        """Create new group's membership."""
         group = self.context['group']
         invitation = self.context['invitation']
         user = self.context['user']
-        now = timezone.now()
 
         # Member creation
         member = Membership.objects.create(
             user=user,
             profile=user.profile,
             group=group,
-            invited_by=invitation.sent_by
-        )
-
-        # Update Invitation
-        invitation.used_by = user
-        invitation.used = True
-        invitation.used_at = now
-        invitation.save()
+            invited_by=invitation.sent_by)
         return member

@@ -39,14 +39,10 @@ class PageViewSet(mixins.CreateModelMixin,
         """Handles page creation."""
         serializer = PageModelSerializer(
             data=request.data,
-            context={
-                'creator': request.user,
-                'category': request.data['category']}
-        )
+            context={'creator': request.user, 'category': request.data['category']})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = serializer.data
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'])
     def create_post(self, request, *args, **kwargs):
@@ -55,15 +51,11 @@ class PageViewSet(mixins.CreateModelMixin,
         serializer = CreatePagePostModelSerializer(
             data=request.data,
             context={
-                'user': request.user,
-                'destination': 'PAGE',
-                'name_destination': page.name,
-                'privacy': 'PUBLIC'}
-        )
+                'user': request.user, 'destination': 'PAGE',
+                'name_destination': page.name, 'privacy': 'PUBLIC'})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = serializer.data
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['get'])
     def posts(self, request, *args, **kwargs):
@@ -80,15 +72,15 @@ class PageViewSet(mixins.CreateModelMixin,
         page = self.get_object()
         followers = page.page_followers
         serializer = UserModelSummarySerializer(followers, many=True)
-        data = serializer.data
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def follow(self, request, *args, **kwargs):
-        """Follow or unfollow a user."""
+        """Follow or unfollow a page."""
         page = self.get_object()
         followers = page.page_followers.all()
         user = request.user
+
         if user not in followers:
             page.page_followers.add(user)
             data = {

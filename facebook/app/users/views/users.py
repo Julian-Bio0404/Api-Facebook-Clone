@@ -1,5 +1,9 @@
 """Users views."""
 
+# Utilities
+from datetime import timedelta
+import jwt
+
 # Django
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -17,15 +21,9 @@ from users.models import User
 
 # Serializers
 from users.serializers import (AccountVerificationSerializer,
-                               UpdatePasswordSerializer,
-                               UserLoginSerializer, 
-                               UserModelSerializer,
-                               UserSignUpSerializer,
-                               RestorePasswordSerializer)
-
-# Utilities
-from datetime import timedelta
-import jwt
+                               RestorePasswordSerializer,
+                               UpdatePasswordSerializer, UserLoginSerializer,
+                               UserModelSerializer, UserSignUpSerializer)
 
 
 class UserViewSet(mixins.ListModelMixin,
@@ -33,7 +31,10 @@ class UserViewSet(mixins.ListModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
     """User view set.
-    Handle signup, login and account verification."""
+
+    Handle signup, login and account verification,
+    refresh token, restore and update password.
+    """
 
     queryset = User.objects.all()
     serializer_class = UserModelSerializer
@@ -55,9 +56,7 @@ class UserViewSet(mixins.ListModelMixin,
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
         data = {
-            'user': UserModelSerializer(user).data,
-            'access_token': token
-        }
+            'user': UserModelSerializer(user).data, 'access_token': token}
         return Response(data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
@@ -67,8 +66,7 @@ class UserViewSet(mixins.ListModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = {
-            'message': 'Congratulations, you can now start using Facebook and connecting with friends.'
-        }
+            'message': 'Congratulations, you can now start using Facebook and connecting with friends.'}
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
@@ -76,7 +74,7 @@ class UserViewSet(mixins.ListModelMixin,
         """Refresh a token verification."""
         user = authenticate(
             username=request.data['email'], password=request.data['password'])
-
+            
         if not user:
             raise serializers.ValidationError('Invalid credentials.')
         else:
@@ -84,23 +82,20 @@ class UserViewSet(mixins.ListModelMixin,
             payload = {
                 'user': user.username,
                 'exp': int(exp_date.timestamp()),
-                'type': 'email_confirmation'
-            }
+                'type': 'email_confirmation'}
+
             # Generacion del token
             token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
             subject = 'Welcome @{}! Verify your account'.format(user.username)
             from_email = 'Facebook <Facebook.com>'
             content = render_to_string(
-                'account_verification.html',
-                {'token': token, 'user': user}
-            )
+                'account_verification.html', {'token': token, 'user': user})
             msg = EmailMultiAlternatives(
                 subject, content, from_email, [user.email])
             msg.attach_alternative(content, 'text/html')
             msg.send()
             data = {
-                'message': 'We send you an new account verification message to your email.'
-            }
+                'message': 'We send you an new account verification message to your email.'}
             return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
@@ -117,15 +112,13 @@ class UserViewSet(mixins.ListModelMixin,
         subject = 'Update your password'
         from_email = 'Facebook <Facebook.com>'
         content = render_to_string(
-            'restore_password.html',
-            {'token': token, 'user': user})
+            'restore_password.html', {'token': token, 'user': user})
         msg = EmailMultiAlternatives(
             subject, content, from_email, [user.email])
         msg.attach_alternative(content, 'text/html')
         msg.send()
         data = {
-            'message': 'We have sent an email for you to reset your password.'
-            }
+            'message': 'We have sent an email for you to reset your password.'}
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
@@ -134,9 +127,7 @@ class UserViewSet(mixins.ListModelMixin,
         serializer = RestorePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = {
-            'message': 'Your password has been reset.'
-        }
+        data = {'message': 'Your password has been reset.'}
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])

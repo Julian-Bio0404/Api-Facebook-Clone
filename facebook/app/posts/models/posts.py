@@ -14,22 +14,15 @@ class Post(FbModel):
     profile = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
 
     about = models.CharField(
-        help_text='write something', 
-        max_length=350, 
-        blank=True
-    )
+        help_text='write something', max_length=350, blank=True)
 
     picture = models.ImageField(
-        help_text='post picture', 
-        upload_to='posts/pictures/', 
-        blank=True, null=True
-    )
+        help_text='post picture', upload_to='posts/pictures/', 
+        blank=True, null=True)
 
     video = models.FileField(
-        help_text='post video',
-        upload_to='posts/videos/',
-        blank=True, null=True
-    )
+        help_text='post video', upload_to='posts/videos/',
+        blank=True, null=True)
 
     # post privacy choices
     POST_PRIVACY = [
@@ -41,10 +34,7 @@ class Post(FbModel):
 
     privacy = models.CharField(
         help_text='privacy of post', 
-        max_length=16, 
-        choices=POST_PRIVACY, 
-        default='FRIENDS'
-    )
+        max_length=16, choices=POST_PRIVACY, default='FRIENDS')
 
     # post feeling choices
     FEELING = [
@@ -60,25 +50,16 @@ class Post(FbModel):
     ]
 
     feeling = models.CharField(
-        help_text='how you feel',  
-        max_length=9, 
-        choices=FEELING,
-        blank=True
-    )
+        help_text='how you feel', max_length=9, 
+        choices=FEELING, blank=True)
 
     location = models.CharField(
-        help_text='where are you?',
-        max_length=60,
-        blank=True
-    )
+        help_text='where are you?', max_length=60, blank=True)
 
     tag_friends = models.ForeignKey(
-        'users.User',
-        on_delete=models.SET_NULL,
+        'users.User', on_delete=models.SET_NULL,
         related_name='tag_friends',
-        blank=True,
-        null=True
-    )
+        blank=True, null=True)
 
     reactions = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
@@ -92,23 +73,16 @@ class Post(FbModel):
 
     destination = models.CharField(
         help_text='specify if the post will be published in a group, page, biography of a friend or in your biography',
-        max_length=9,
-        choices=TYPE_DESTINATION,
-        default='BIOGRAPHY'
-    )
+        max_length=9, choices=TYPE_DESTINATION,
+        default='BIOGRAPHY')
 
     name_destination = models.CharField(
         help_text="name of post's destination",
-        max_length=60,
-        blank=True
-    )
+        max_length=60, blank=True)
 
     re_post = models.ForeignKey(
-        'self', 
-        help_text='post to be republished',
-        null=True, 
-        on_delete=models.SET_NULL
-    )
+        'self', help_text='post to be republished',
+        on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         """Return about and username"""

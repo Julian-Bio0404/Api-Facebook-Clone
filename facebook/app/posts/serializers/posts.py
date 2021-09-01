@@ -74,20 +74,21 @@ class PostModelSerializer(serializers.ModelSerializer):
         """Create a post."""
         user = self.context['user']
         profile = user.profile
+
         if self.context['post']:
             re_post = re_post = self.context['post']
 
             # Post
             post = Post.objects.create(
-                **data, user=user, 
-                profile=profile, 
+                **data, user=user,
+                profile=profile,
                 re_post=re_post)
 
             # Shared
             Shared.objects.create(
-                user=user, 
+                user=user,
                 post=re_post,
-                about= data['about'])
+                about=data['about'])
 
             # Repost
             re_post.shares += 1
@@ -124,10 +125,10 @@ class CreatePagePostModelSerializer(PostModelSerializer):
         user = self.context['user']
         profile = user.profile
         post = Post.objects.create(
-            **data, user=user, 
-            profile=profile, 
+            **data, user=user,
+            profile=profile,
             privacy=self.context['privacy'],
-            destination=self.context['destination'], 
+            destination=self.context['destination'],
             name_destination=self.context['name_destination'])
         post.save()
         return post

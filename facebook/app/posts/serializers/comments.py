@@ -31,11 +31,9 @@ class CommentModelSerializer(serializers.ModelSerializer):
         profile = user.profile
         post = self.context['post']
         comment = Comment.objects.create(
-            **data, 
-            user=user, 
+            **data, user=user, 
             profile=profile, 
-            post=post
-        )
+            post=post)
         comment.save()
 
         # Post

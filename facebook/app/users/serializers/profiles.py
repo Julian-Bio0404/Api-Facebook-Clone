@@ -27,22 +27,16 @@ class ProfileModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta options."""
         model = Profile
-        fields = (
-            'photo',
-            'cover_photo',
-            'about',
-            'hobby',
-            'birth_date',
-            'origin_country',
-            'friends',
-            'followers',
-            'following',
-            'profiledetail'
-        )
+        fields = [
+            'photo', 'cover_photo',
+            'about', 'hobby',
+            'birth_date', 'origin_country',
+            'friends', 'followers',
+            'following', 'profiledetail'
+        ]
 
         read_only_fields = [
-            'followers',
-            'following'
+            'followers', 'following'
             'profiledetail',
         ]
         

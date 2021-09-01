@@ -3,13 +3,12 @@
 # Django REST Framework
 from rest_framework import serializers
 
-# Serializers
-from users.serializers import UserModelSummarySerializer
-from posts.serializers.comments import CommentModelSerializer
-from posts.serializers.posts import PostModelSerializer
-
 # Models
 from posts.models import ReactionComment, ReactionPost
+
+# Serializers
+from users.serializers import UserModelSummarySerializer
+from posts.serializers import CommentModelSerializer, PostModelSerializer
 
 
 class ReactionPostModelSerializer(serializers.ModelSerializer):
@@ -31,13 +30,13 @@ class ReactionPostModelSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Velidate.
-        verify that the user's reaction does not exist yet
+
+        verify that the user's reaction does not exist yet.
         """
         try:
             user = self.context['user']
-            reaction = ReactionPost.objects.get(
-                user=user
-            )
+            reaction = ReactionPost.objects.get(user=user)
+
             # Si la reaccion del usuario existe, esta se elimina
             reaction.delete()
             post = self.context['post']
@@ -53,11 +52,9 @@ class ReactionPostModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         post = self.context['post']
         reaction_post = ReactionPost.objects.create(
-            **data,
-            user=user,
+            **data, user=user,
             profile=user.profile,
-            post=post
-        )
+            post=post)
         reaction_post.save()
 
         # Post
@@ -100,6 +97,7 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Velidate.
+
         verify that the user's reaction does not exist yet
         """
         try:
@@ -122,11 +120,9 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         comment = self.context['comment']
         reaction_comment = ReactionComment.objects.create(
-            **data, 
-            user=user, 
-            profile= user.profile, 
-            comment=comment
-        )
+            **data, user=user,
+            profile=user.profile,
+            comment=comment)
         reaction_comment.save()
 
         # Comment
@@ -137,7 +133,7 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
 
 class ReactionCommentModelSummarySerializer(ReactionCommentModelSerializer):
     """Reaction comment model summary serializer"""
-    
+
     class Meta:
         """Meta options."""
         model = ReactionComment
