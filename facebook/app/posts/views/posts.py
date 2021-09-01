@@ -6,12 +6,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Models
-from posts.models import Post, ReactionPost
+from posts.models import Post, ReactionPost, Shared
 
 # Serializers
 from posts.serializers import (PostModelSerializer,
                                ReactionPostModelSerializer,
-                               ReactionPostModelSummarySerializer)
+                               ReactionPostModelSummarySerializer,
+                               SharedModelSerializer)
 
 
 class PostViewSet(mixins.CreateModelMixin,
@@ -29,7 +30,7 @@ class PostViewSet(mixins.CreateModelMixin,
     serializer_class = PostModelSerializer
 
     def create(self, request):
-        """Create a post."""
+        """Hanle post creation."""
         serializer = PostModelSerializer(
             data=request.data,
             context={'user': request.user}
@@ -41,7 +42,7 @@ class PostViewSet(mixins.CreateModelMixin,
     
     @action(detail=True, methods=['post'])
     def react(self, request, *args, **kwargs):
-        """Create a post's reaction."""
+        """Hanle post's reaction."""
         post = self.get_object()
         serializer = ReactionPostModelSerializer(
             data=request.data,
@@ -83,3 +84,12 @@ class PostViewSet(mixins.CreateModelMixin,
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'])
+    def post_shares(self, request, *args, **kwargs):
+        """Handle list shares of a post."""
+        post = self.get_object()
+        shares = Shared.objects.filter(post=post)
+        serializer = SharedModelSerializer(shares, many=True)
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)

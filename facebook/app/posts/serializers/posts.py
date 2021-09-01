@@ -44,12 +44,14 @@ class PostModelSerializer(serializers.ModelSerializer):
             'video', 'privacy', 'feeling',
             'location', 'tag_friends',
             'reactions', 'destination',
-            'name_destination', 're_post'
+            'name_destination', 're_post',
+            'comments', 'shares'
         ]
 
         read_only_fields = [
             'user', 'reactions', 
-            're_post'
+            're_post', 'comments', 
+            'shares'
         ]
 
     def validate(self, data):
@@ -73,10 +75,23 @@ class PostModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         profile = user.profile
         if self.context['post']:
+            re_post = re_post = self.context['post']
+
+            # Post
             post = Post.objects.create(
                 **data, user=user, 
                 profile=profile, 
-                re_post=self.context['post'])
+                re_post=re_post)
+
+            # Shared
+            Shared.objects.create(
+                user=user, 
+                post=re_post,
+                about= data['about'])
+
+            # Repost
+            re_post.shares += 1
+            re_post.save()
         else:
             post = Post.objects.create(**data, user=user, profile=profile)
             post.save()
