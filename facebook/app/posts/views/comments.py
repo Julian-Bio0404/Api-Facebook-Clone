@@ -15,7 +15,8 @@ from posts.serializers import (CommentModelSerializer,
                                ReactionCommentModelSummarySerializer)
 
 
-class CommentViewSet(mixins.ListModelMixin,
+class CommentViewSet(mixins.CreateModelMixin,
+                     mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.UpdateModelMixin,
                      mixins.DestroyModelMixin,
@@ -32,15 +33,20 @@ class CommentViewSet(mixins.ListModelMixin,
         id = kwargs['id']
         self.object = get_object_or_404(Post, id=id)
         return super(CommentViewSet, self).dispatch(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        """Delete a comment and subtract -1 from comments on the post."""
+        self.object.comments -= 1
+        self.object.save()
+        instance.delete()
     
     def get_queryset(self):
         """Return post's comments."""
         comments = Comment.objects.filter(post=self.object)
         return comments
     
-    @action(detail=False, methods=['post'])
-    def comment(self, request, *args, **kwargs):
-        """Hanles comment creation."""
+    def create(self, request, *args, **kwargs):
+        """Handles comment creation."""
         serializer = CommentModelSerializer(
             data=request.data, context={'user': request.user, 'post': self.object})
         serializer.is_valid(raise_exception=True)

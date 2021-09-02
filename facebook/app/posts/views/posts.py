@@ -21,7 +21,7 @@ class PostViewSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
-    """ Post view set.
+    """Post view set.
 
     Handle list, create, update, destroy
     and sharing post.
@@ -31,7 +31,7 @@ class PostViewSet(mixins.CreateModelMixin,
     serializer_class = PostModelSerializer
 
     def create(self, request):
-        """Hanles post creation."""
+        """Handles post creation."""
         serializer = PostModelSerializer(
             data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
@@ -40,7 +40,7 @@ class PostViewSet(mixins.CreateModelMixin,
 
     @action(detail=True, methods=['post'])
     def react(self, request, *args, **kwargs):
-        """Hanles post's reaction."""
+        """Handles post's reaction."""
         post = self.get_object()
         serializer = ReactionPostModelSerializer(
             data=request.data, context={'user': request.user, 'post': post})
@@ -70,7 +70,7 @@ class PostViewSet(mixins.CreateModelMixin,
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['get'])
     def post_shares(self, request, *args, **kwargs):
         """Handles list shares of a post."""
         post = self.get_object()

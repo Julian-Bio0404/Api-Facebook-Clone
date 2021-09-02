@@ -1,16 +1,13 @@
 """Membership serializer."""
 
-# Django
-from django.utils import timezone
-
 # Django REST Framework
 from rest_framework import serializers
 
-# Serializers
-from users.serializers import UserModelSerializer
-
 # Models
 from groups.models import Membership, Invitation
+
+# Serializers
+from users.serializers import UserModelSerializer
 
 
 class MembershipModelSerializer(serializers.ModelSerializer):

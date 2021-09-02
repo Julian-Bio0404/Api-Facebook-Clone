@@ -55,11 +55,20 @@ class PostModelSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Verify that about, picture or video are present."""
-        if self.context['post']:
+        """verify that only the about, privacy, destination and 
+        name destination fields are present if it is a repost.
+        If it is a post, verify that about, picture or video are present.
+        """
+
+        if 'post' in self.context.keys():
+            fields = ['picture', 'video', 'feeling', 'location', 'tag_friends']
+            for i in data:
+                if i in fields:
+                    raise serializers.ValidationError(
+                        'You can only send an about, privacy, destination or name destination.')
             return data
         else:
-            media = ['picture', 'video', 'about']
+            media = ['about', 'picture', 'video']
             match = False
             for i in media:
                 if i in data:
@@ -75,8 +84,10 @@ class PostModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         profile = user.profile
 
-        if self.context['post']:
-            re_post = re_post = self.context['post']
+        # Si viene un post en el contexto,
+        # se crea un post con el repost
+        if 'post' in self.context.keys():
+            re_post = self.context['post']
 
             # Post
             post = Post.objects.create(
@@ -86,8 +97,7 @@ class PostModelSerializer(serializers.ModelSerializer):
 
             # Shared
             Shared.objects.create(
-                user=user,
-                post=re_post,
+                user=user, post=re_post,
                 about=data['about'])
 
             # Repost
