@@ -19,7 +19,7 @@ class CategorySaved(FbModel):
 
 
 class Saved(FbModel):
-    """ Saved model."""
+    """Saved model."""
 
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     post = models.ForeignKey('posts.Post', on_delete=models.CASCADE)
