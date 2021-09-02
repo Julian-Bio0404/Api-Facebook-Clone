@@ -5,6 +5,11 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+
+
 # Serializers
 from groups.serializers import GroupModelSerializer
 from posts.serializers import PostModelSerializer
@@ -24,6 +29,11 @@ class GroupeViewSet(mixins.CreateModelMixin,
 
     serializer_class = GroupModelSerializer
     lookup_field = 'slug_name'
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    search_fields = ('slug_name', 'name')
+    ordering_fields = ('name', 'created')
+    ordering = ('-members__count',)
+    filter_fields = ('is_public',)  # DjangoFilterBackend
 
     def get_queryset(self):
         """Restrict list to public-only."""

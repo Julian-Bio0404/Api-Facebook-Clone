@@ -5,6 +5,9 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 # Serializers
 from fbpages.serializers import PageModelSerializer
 from posts.serializers import (CreatePagePostModelSerializer,
@@ -27,6 +30,9 @@ class PageViewSet(mixins.CreateModelMixin,
     queryset = Page.objects.all()
     serializer_class = PageModelSerializer
     lookup_field = 'slug_name'
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('slug_name', 'name', 'category__name')
+    ordering_fields = ('name', 'created')
 
     def perform_destroy(self, instance):
         """Delete page and page's posts."""
