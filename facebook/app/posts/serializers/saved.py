@@ -21,12 +21,17 @@ class CategorySavedModelSerializer(serializers.ModelSerializer):
         fields = ['user', 'name']
         read_only_fields = ['user']
 
+    def create(self, data):
+        """Create category."""
+        return CategorySaved.objects.create(**data, user=self.context['user'])
+
 
 class SavedPostModelSerializer(serializers.ModelSerializer):
     """Saved post model serializer."""
 
     user = serializers.StringRelatedField(read_only=True)
     post = PostModelSerializer(read_only=True)
+    saved_category = serializers.StringRelatedField()
 
     class Meta:
         """Meta options."""
@@ -40,3 +45,11 @@ class SavedPostModelSerializer(serializers.ModelSerializer):
             'user', 'post',
             'saved_category'
         ]
+
+    def create(self, data):
+        """Create saved."""
+        saved = Saved.objects.create(
+            user=self.context['user'], 
+            post=self.context['post'], 
+            saved_category=self.context['saved_category'])
+        return saved
