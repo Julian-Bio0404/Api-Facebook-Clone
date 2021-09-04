@@ -4,10 +4,11 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import Post, Shared
+from posts.models import Picture, Post, Shared, Video
 
 # Serializers
 from users.serializers import UserModelSummarySerializer
+from .media import ImageModelSerializer, VideoModelSerializer
 
 
 class SharedPostModelSerializer(serializers.ModelSerializer):
@@ -19,8 +20,8 @@ class SharedPostModelSerializer(serializers.ModelSerializer):
         """Meta options."""
         model = Post
         fields = [
-            'user','about', 'picture',
-            'video', 'privacy', 'feeling',
+            'user','about', 'pictures',
+            'videos', 'privacy', 'feeling',
             'location', 'tag_friends',
             'reactions'
         ]
@@ -35,13 +36,15 @@ class PostModelSerializer(serializers.ModelSerializer):
 
     user = UserModelSummarySerializer(read_only=True)
     re_post = SharedPostModelSerializer(read_only=True)
+    pictures = ImageModelSerializer(read_only=True, many=True)
+    videos = VideoModelSerializer(read_only=True, many=True)
 
     class Meta:
         """Meta options."""
         model = Post
         fields = [
-            'user','about', 'picture',
-            'video', 'privacy', 'feeling',
+            'user','about', 'pictures',
+            'videos', 'privacy', 'feeling',
             'location', 'tag_friends',
             'reactions', 'destination',
             'name_destination', 're_post',
@@ -50,7 +53,8 @@ class PostModelSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             'user', 'reactions', 
-            're_post', 'comments', 
+            're_post', 'pictures',
+            'videos', 'comments', 
             'shares'
         ]
 
@@ -60,18 +64,20 @@ class PostModelSerializer(serializers.ModelSerializer):
         If it is a post, verify that about, picture or video are present.
         """
 
+        # Si es un repost, NO permite que se publique con los campos incluidos en fields
         if 'post' in self.context.keys():
-            fields = ['picture', 'video', 'feeling', 'location', 'tag_friends']
-            for i in data:
+            fields = ['pictures', 'videos', 'feeling', 'location', 'tag_friends']
+            for i in self.context['request'].data.keys():
                 if i in fields:
                     raise serializers.ValidationError(
                         'You can only send an about, privacy, destination or name destination.')
             return data
         else:
-            media = ['about', 'picture', 'video']
+            # De lo contrario, verifica que venga al menos un campo de media
+            media = ['about', 'pictures', 'videos']
             match = False
             for i in media:
-                if i in data:
+                if i in self.context['request'].data.keys():
                     match = True
                     break
             if match == False:
@@ -105,7 +111,19 @@ class PostModelSerializer(serializers.ModelSerializer):
             re_post.save()
         else:
             post = Post.objects.create(**data, user=user, profile=profile)
-            post.save()
+            try:
+                videos = self.context['request'].data.getlist('videos')
+                pictures = self.context['request'].data.getlist('pictures')
+                
+                for image in pictures:
+                    picture = Picture.objects.create(content=image)
+                    post.pictures.add(picture)
+                
+                for i in videos:
+                    video = Video.objects.create(content=i)
+                    post.videos.add(video)
+            except AttributeError:
+                post.save()
         return post
 
 

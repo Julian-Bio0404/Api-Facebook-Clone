@@ -16,13 +16,8 @@ class Post(FbModel):
     about = models.CharField(
         help_text='write something', max_length=350, blank=True)
 
-    picture = models.ImageField(
-        help_text='post picture', upload_to='posts/pictures/', 
-        blank=True, null=True)
-
-    video = models.FileField(
-        help_text='post video', upload_to='posts/videos/',
-        blank=True, null=True)
+    pictures = models.ManyToManyField('Picture', blank=True)
+    videos = models.ManyToManyField('Video', blank=True)
 
     # post privacy choices
     POST_PRIVACY = [
