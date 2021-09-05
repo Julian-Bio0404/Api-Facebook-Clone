@@ -16,6 +16,10 @@ from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from app.users.permissions import IsAccountOwner
+
 # Models
 from users.models import User
 
@@ -36,9 +40,21 @@ class UserViewSet(mixins.ListModelMixin,
     refresh token, restore and update password.
     """
 
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_verified=True)
     serializer_class = UserModelSerializer
     lookup_field = 'username'
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in [
+            'signup', 'login', 'verify', 'refresh_token', 
+            'token_restore_password', 'restore_password']:
+            permissions = [AllowAny]
+        elif self.action in ['retrieve', 'update', 'partial_update']:
+           permissions = [IsAuthenticated, IsAccountOwner]
+        else:
+            permissions = [IsAuthenticated]
+        return[p() for p in permissions]
 
     @action(detail=False, methods=['post'])
     def signup(self, request):
@@ -106,8 +122,7 @@ class UserViewSet(mixins.ListModelMixin,
         payload = {
             'user': user.username,
             'exp': int(exp_date.timestamp()),
-            'type': 'restore_password'
-        }
+            'type': 'restore_password'}
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         subject = 'Update your password'
         from_email = 'Facebook <Facebook.com>'
