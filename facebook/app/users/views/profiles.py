@@ -5,6 +5,10 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from app.users.permissions import IsProfileOwner
+
 # Models
 from users.models import Profile
 from posts.models import Post
@@ -23,14 +27,23 @@ class ProfileViewSet(mixins.ListModelMixin,
     """Profile view set.
 
     Handle list profile, update profile, 
-    update profile details, list friends,
-    follow or unfollow users and list
-    followers or following.
+    update profile details, follow or unfollow 
+    users and list followers, following and friends.
     """
 
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.filter(user__is_verified=True)
     serializer_class = ProfileModelSerializer
     lookup_field = 'user__username'
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in ['retrieve']:
+            permissions = [AllowAny]
+        elif self.action in ['update', 'partial_update']:
+           permissions = [IsAuthenticated, IsProfileOwner]
+        else:
+            permissions = [IsAuthenticated]
+        return[p() for p in permissions]
 
     def retrieve(self, request, *args, **kwargs):
         """"Return profile and posts of user."""

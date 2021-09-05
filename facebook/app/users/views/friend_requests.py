@@ -6,6 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from app.users.permissions import IsRequestedUser
+
 # Models
 from users.models import FriendRequest, User
 
@@ -26,6 +30,14 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
     """
 
     serializer_class = ProfileModelSerializer
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in ['retrieve', 'confirm', 'destroy']:
+           permissions = [IsAuthenticated, IsRequestedUser]
+        else:
+            permissions = [IsAuthenticated]
+        return[p() for p in permissions]
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that the user exists."""
@@ -55,10 +67,14 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
     
     def list(self, request, *args, **kwargs):
         """List all user's friend request."""
-        friend_requests = FriendRequest.objects.filter(
-            requested_user=self.user)
-        serializer = FriendRequestModelSerializer(friend_requests, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.user == self.user:
+            friend_requests = FriendRequest.objects.filter(
+                requested_user=request.user)
+            serializer = FriendRequestModelSerializer(friend_requests, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': 'You do not have permission for this action.'}
+            return Response(data, status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['post'])
     def confirm(self, request, *args, **kwargs):
