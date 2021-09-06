@@ -19,8 +19,8 @@ class PostAdmin(admin.ModelAdmin):
         'pk','user', 'destination',
         'name_destination','about', 
         'privacy', 'feeling', 'location', 
-        'tag_friends', 'reactions', 
-        'comments', 're_post', 'created'
+        'reactions', 'comments', 
+        're_post', 'created'
     ]
 
     search_fields = [

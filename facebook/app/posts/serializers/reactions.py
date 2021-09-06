@@ -14,7 +14,7 @@ from posts.serializers import CommentModelSerializer, PostModelSerializer
 class ReactionPostModelSerializer(serializers.ModelSerializer):
     """Reaction post model serializer."""
 
-    user = UserModelSummarySerializer(read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
     post = PostModelSerializer(read_only=True)
 
     class Meta:

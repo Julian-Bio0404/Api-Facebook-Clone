@@ -5,6 +5,10 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from app.posts.permissions import IsFriend, IsPostOwner
+
 # Models
 from posts.models import Post, ReactionPost, Shared
 
@@ -23,12 +27,24 @@ class PostViewSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     """Post view set.
 
-    Handle list, create, update, destroy
-    and sharing post.
+    Handle list, create, update, destroy,
+    sharing, list shares, react to a post
+    and list post's reactions.
     """
 
     queryset = Post.objects.all()
     serializer_class = PostModelSerializer
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in [
+            'retrieve', 'react', 'reactions', 'share', 'post_shares']:
+            permissions = [IsFriend]
+        elif self.action in ['update', 'partial_update']:
+           permissions = [IsAuthenticated, IsPostOwner]
+        else:
+            permissions = [IsAuthenticated]
+        return[p() for p in permissions]
 
     def create(self, request):
         """Handles post creation."""
@@ -65,7 +81,7 @@ class PostViewSet(mixins.CreateModelMixin,
         """Handles share post."""
         post = self.get_object()
         serializer = PostModelSerializer(
-            data=request.data, context={'user': request.user,'post': post})
+            data=request.data, context={'user': request.user,'post': post, 'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

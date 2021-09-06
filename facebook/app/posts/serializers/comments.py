@@ -6,14 +6,11 @@ from rest_framework import serializers
 # Models
 from posts.models import Comment
 
-# Serializers
-from users.serializers import UserModelSummarySerializer
-
 
 class CommentModelSerializer(serializers.ModelSerializer):
     """Post model serializer."""
 
-    user = UserModelSummarySerializer(read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         """Meta options."""

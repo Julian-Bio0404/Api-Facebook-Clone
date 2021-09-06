@@ -30,6 +30,12 @@ class Post(FbModel):
     privacy = models.CharField(
         help_text='privacy of post', 
         max_length=16, choices=POST_PRIVACY, default='FRIENDS')
+    
+    friends_exc = models.ManyToManyField(
+        'users.User', blank=True, related_name='friends_exc')
+
+    specific_friends = models.ManyToManyField(
+        'users.User', blank=True, related_name='specific_friends')
 
     # post feeling choices
     FEELING = [
@@ -45,16 +51,13 @@ class Post(FbModel):
     ]
 
     feeling = models.CharField(
-        help_text='how you feel', max_length=9, 
-        choices=FEELING, blank=True)
+        help_text='how you feel', max_length=9, choices=FEELING, blank=True)
 
     location = models.CharField(
         help_text='where are you?', max_length=60, blank=True)
 
-    tag_friends = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL,
-        related_name='tag_friends',
-        blank=True, null=True)
+    tag_friends = models.ManyToManyField(
+        'users.User', blank=True, related_name='tag_friends')
 
     reactions = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
@@ -72,8 +75,7 @@ class Post(FbModel):
         default='BIOGRAPHY')
 
     name_destination = models.CharField(
-        help_text="name of post's destination",
-        max_length=60, blank=True)
+        help_text="name of post's destination", max_length=60, blank=True)
 
     re_post = models.ForeignKey(
         'self', help_text='post to be republished',

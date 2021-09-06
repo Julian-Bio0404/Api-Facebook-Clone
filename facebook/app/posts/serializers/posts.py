@@ -5,16 +5,22 @@ from rest_framework import serializers
 
 # Models
 from posts.models import Picture, Post, Shared, Video
+from users.models import User
 
 # Serializers
-from users.serializers import UserModelSummarySerializer
 from .media import ImageModelSerializer, VideoModelSerializer
 
 
 class SharedPostModelSerializer(serializers.ModelSerializer):
-    """Shared post model serializer."""
+    """Shared post model serializer
 
-    user = UserModelSummarySerializer(read_only=True)
+    Serialize a repost.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    pictures = ImageModelSerializer(read_only=True, many=True)
+    videos = VideoModelSerializer(read_only=True, many=True)  
+    tag_friends = serializers.StringRelatedField(required=False, many=True)  
 
     class Meta:
         """Meta options."""
@@ -31,13 +37,10 @@ class SharedPostModelSerializer(serializers.ModelSerializer):
         ]
 
 
-class PostModelSerializer(serializers.ModelSerializer):
+class PostModelSerializer(SharedPostModelSerializer):
     """Post model serializer."""
 
-    user = UserModelSummarySerializer(read_only=True)
     re_post = SharedPostModelSerializer(read_only=True)
-    pictures = ImageModelSerializer(read_only=True, many=True)
-    videos = VideoModelSerializer(read_only=True, many=True)
 
     class Meta:
         """Meta options."""
@@ -57,6 +60,11 @@ class PostModelSerializer(serializers.ModelSerializer):
             'videos', 'comments', 
             'shares'
         ]
+
+    def post_privacy(self, data):
+        """Verify post privacy, friends_exc and especific_friends."""
+        pass
+
 
     def validate(self, data):
         """verify that only the about, privacy, destination and 
@@ -130,7 +138,7 @@ class PostModelSerializer(serializers.ModelSerializer):
 class CreatePagePostModelSerializer(PostModelSerializer):
     """Create Page Post model serializer."""
 
-    user = serializers.StringRelatedField()
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         """Meta options."""
@@ -165,7 +173,7 @@ class CreatePagePostModelSerializer(PostModelSerializer):
 class SharedModelSerializer(serializers.ModelSerializer):
     """Shared model serializer."""
 
-    user = serializers.StringRelatedField()
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         """Meta options."""
