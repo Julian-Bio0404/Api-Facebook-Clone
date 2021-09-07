@@ -1,5 +1,8 @@
 """Profiles views."""
 
+# Django
+from django.db.models import Q
+
 # Django REST framework
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -45,15 +48,6 @@ class ProfileViewSet(mixins.ListModelMixin,
             permissions = [IsAuthenticated]
         return[p() for p in permissions]
 
-    def retrieve(self, request, *args, **kwargs):
-        """"Return profile and posts of user."""
-        profile = self.get_object()
-        posts = Post.objects.filter(profile=profile)
-        profile_serializer = ProfileModelSerializer(profile).data
-        posts_serializer = PostModelSerializer(posts, many=True).data
-        data = {'profile': profile_serializer, 'posts': posts_serializer}
-        return Response(data, status=status.HTTP_200_OK)
-
     @action(detail=True, methods=['put', 'patch'])
     def update_details(self, request, *args, **kwargs):
         """Update profile details."""
@@ -65,6 +59,26 @@ class ProfileViewSet(mixins.ListModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def posts(self, request, *args, **kwargs):
+        """List profile's posts. 
+        Restric according to the user requesting and privacy of posts.
+        """
+        profile = self.get_object()
+        friends = list(profile.friends.all())
+        
+        if request.user in friends or request.user.profile == profile:
+            posts = Post.objects.filter(
+                Q(profile=profile, destination='BIOGRAPHY') | Q(
+                    destination='FRIEND', name_destination=profile.user.username))
+        else:
+            posts = Post.objects.filter(
+                Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC') | Q(
+                    destination='FRIEND', 
+                    name_destination=profile.user.username, privacy='PUBLIC'))
+        data = PostModelSerializer(posts, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def friends(self, request, *args, **kwargs):

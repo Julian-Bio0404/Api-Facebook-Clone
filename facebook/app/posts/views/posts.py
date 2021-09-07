@@ -1,12 +1,15 @@
 """Posts views."""
 
+# Django
+from django.db.models import Q
+
 # Django REST framework
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Permissions
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from app.posts.permissions import IsFriend, IsPostOwner
 
 # Models
@@ -32,8 +35,19 @@ class PostViewSet(mixins.CreateModelMixin,
     and list post's reactions.
     """
 
-    queryset = Post.objects.all()
     serializer_class = PostModelSerializer
+
+    def get_queryset(self):
+        """Restrict list to public or friend's posts."""
+        queryset = Post.objects.all()
+        user = self.request.user
+        friends = list(user.profile.friends.all())
+        friends.append(user)
+
+        if self.action == 'list':
+            queryset = Post.objects.filter(
+                Q(privacy='PUBLIC') | Q(user__in=friends, privacy='FRIENDS'))
+        return queryset
 
     def get_permissions(self):
         """Assign permissions based on action."""
