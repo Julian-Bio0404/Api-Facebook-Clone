@@ -61,16 +61,31 @@ class PostModelSerializer(SharedPostModelSerializer):
             'shares'
         ]
 
-    def post_privacy(self, data):
-        """Verify post privacy, friends_exc and especific_friends."""
-        pass
-
-
     def validate(self, data):
-        """verify that only the about, privacy, destination and 
+        """verify privacy and that only the about, destination and 
         name destination fields are present if it is a repost.
         If it is a post, verify that about, picture or video are present.
         """
+        # Verifica privacidad del post
+        if ('friends_exc' in self.context['request'].data.keys() 
+            and data['privacy'] != 'FRIENDS_EXC'):
+            raise serializers.ValidationError(
+                'You must specify privacy in FRIENDS_EXC.')
+
+        if ('specific_friends' in self.context['request'].data.keys() 
+            and data['privacy'] != 'SPECIFIC_FRIENDS'):
+            raise serializers.ValidationError(
+                'You must specify privacy in SPECIFIC_FRIENDS.')
+
+        if (data['privacy'] == 'FRIENDS_EXC' 
+            and 'friends_exc' not in self.context['request'].data.keys()):
+            raise serializers.ValidationError(
+                'You must specify a list of usernames in friends_exc.')
+        
+        if (data['privacy'] == 'SPECIFIC_FRIENDS' 
+            and 'specific_friends' not in self.context['request'].data.keys()):
+                raise serializers.ValidationError(
+                    'You must specify a list of usernames in specific_friends.')
 
         # Si es un repost, NO permite que se publique con los campos incluidos en fields
         if 'post' in self.context.keys():
@@ -98,6 +113,27 @@ class PostModelSerializer(SharedPostModelSerializer):
         user = self.context['user']
         profile = user.profile
 
+        # Add friends_except or specific_friends in the privacity configuration
+        if data['privacy'] == 'FRIENDS_EXC':
+            friends_except = []
+            for username in self.context['request'].data['friends_exc']:
+                try:
+                    friend = User.objects.get(username=username)
+                    friends_except.append(friend)
+                except User.DoesNotExist:
+                    raise serializers.ValidationError(
+                        f'The user with username {username} does not exist.')
+
+        elif data['privacy'] == 'SPECIFIC_FRIENDS':
+            specific_friends = []
+            for username in self.context['request'].data['specific_friends']:
+                try:
+                    friend = User.objects.get(username=username)
+                    specific_friends.append(friend)
+                except User.DoesNotExist:
+                    raise serializers.ValidationError(
+                        f'The user with username {username} does not exist.')
+
         # Si viene un post en el contexto,
         # se crea un post con el repost
         if 'post' in self.context.keys():
@@ -105,14 +141,11 @@ class PostModelSerializer(SharedPostModelSerializer):
 
             # Post
             post = Post.objects.create(
-                **data, user=user,
-                profile=profile,
-                re_post=re_post)
+                **data, user=user, profile=profile, re_post=re_post)
 
             # Shared
             Shared.objects.create(
-                user=user, post=re_post,
-                about=data['about'])
+                user=user, post=re_post, about=data['about'])
 
             # Repost
             re_post.shares += 1
@@ -132,6 +165,15 @@ class PostModelSerializer(SharedPostModelSerializer):
                     post.videos.add(video)
             except AttributeError:
                 post.save()
+
+        # Privacy
+        if friends_except:
+            for friend in friends_except:
+                post.friends_exc.add(friend)
+        elif specific_friends:
+            for friend in specific_friends:
+                post.specific_friends.add(friend)
+        post.save()
         return post
 
 
