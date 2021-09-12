@@ -68,25 +68,26 @@ class PostModelSerializer(SharedPostModelSerializer):
         If it is a post, verify that about, picture or video are present.
         """
         # Verifica privacidad del post
-        if ('friends_exc' in self.context['request'].data.keys() 
-            and data['privacy'] != 'FRIENDS_EXC'):
-            raise serializers.ValidationError(
-                'You must specify privacy in FRIENDS_EXC.')
-
-        if ('specific_friends' in self.context['request'].data.keys() 
-            and data['privacy'] != 'SPECIFIC_FRIENDS'):
-            raise serializers.ValidationError(
-                'You must specify privacy in SPECIFIC_FRIENDS.')
-
-        if (data['privacy'] == 'FRIENDS_EXC' 
-            and 'friends_exc' not in self.context['request'].data.keys()):
-            raise serializers.ValidationError(
-                'You must specify a list of usernames in friends_exc.')
-        
-        if (data['privacy'] == 'SPECIFIC_FRIENDS' 
-            and 'specific_friends' not in self.context['request'].data.keys()):
+        if 'privacy' in data.keys():
+            if ('friends_exc' in self.context['request'].data.keys() 
+                and data['privacy'] != 'FRIENDS_EXC'):
                 raise serializers.ValidationError(
-                    'You must specify a list of usernames in specific_friends.')
+                    'You must specify privacy in FRIENDS_EXC.')
+
+            if ('specific_friends' in self.context['request'].data.keys() 
+                and data['privacy'] != 'SPECIFIC_FRIENDS'):
+                raise serializers.ValidationError(
+                    'You must specify privacy in SPECIFIC_FRIENDS.')
+
+            if (data['privacy'] == 'FRIENDS_EXC' 
+                and 'friends_exc' not in self.context['request'].data.keys()):
+                raise serializers.ValidationError(
+                    'You must specify a list of usernames in friends_exc.')
+            
+            if (data['privacy'] == 'SPECIFIC_FRIENDS' 
+                and 'specific_friends' not in self.context['request'].data.keys()):
+                    raise serializers.ValidationError(
+                        'You must specify a list of usernames in specific_friends.')
 
         # Si es un repost, NO permite que se publique con los campos incluidos en fields
         if 'post' in self.context.keys():
@@ -147,23 +148,24 @@ class PostModelSerializer(SharedPostModelSerializer):
                 post.save()
 
         # Add friends_except or specific_friends in the privacy configuration
-        if data['privacy'] == 'FRIENDS_EXC':
-            for username in self.context['request'].data['friends_exc']:
-                try:
-                    friend = User.objects.get(username=username)
-                    post.friends_exc.add(friend)
-                except User.DoesNotExist:
-                    raise serializers.ValidationError(
-                        f'The user with username {username} does not exist.')
+        if 'privacy' in data.keys():
+            if data['privacy'] == 'FRIENDS_EXC':
+                for username in self.context['request'].data['friends_exc']:
+                    try:
+                        friend = User.objects.get(username=username)
+                        post.friends_exc.add(friend)
+                    except User.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f'The user with username {username} does not exist.')
 
-        elif data['privacy'] == 'SPECIFIC_FRIENDS':
-            for username in self.context['request'].data['specific_friends']:
-                try:
-                    friend = User.objects.get(username=username)
-                    post.specific_friends.add(friend)
-                except User.DoesNotExist:
-                    raise serializers.ValidationError(
-                        f'The user with username {username} does not exist.')
+            elif data['privacy'] == 'SPECIFIC_FRIENDS':
+                for username in self.context['request'].data['specific_friends']:
+                    try:
+                        friend = User.objects.get(username=username)
+                        post.specific_friends.add(friend)
+                    except User.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f'The user with username {username} does not exist.')
         post.save()
         return post
 

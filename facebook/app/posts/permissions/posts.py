@@ -15,6 +15,8 @@ class IsPostOwner(BasePermission):
 class IsFriend(BasePermission):
     """Allow access only to friends of a user."""
 
+    message = 'This content isn`t available right now.'
+
     def has_object_permission(self, request, view, obj):
         """Check privacy obj and if user is friend of the post owner. """
         post_owner = obj.user
