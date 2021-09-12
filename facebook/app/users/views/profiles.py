@@ -68,14 +68,26 @@ class ProfileViewSet(mixins.ListModelMixin,
         profile = self.get_object()
         friends = list(profile.friends.all())
 
-        if request.user in friends or request.user.profile == profile:
+        if request.user.profile == profile:
             posts = Post.objects.filter(
                 Q(profile=profile, destination='BIOGRAPHY') |
                 Q(destination='FRIEND', name_destination=profile.user.username))
+        elif request.user in friends:
+            posts = Post.objects.filter(
+                Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC')
+                | Q(profile=profile, destination='BIOGRAPHY', privacy='FRIENDS')
+                | Q(profile=profile, destination='BIOGRAPHY', specific_friends__in=[request.user])
+                | Q(destination='FRIEND', name_destination=profile.user.username, privacy='FRIENDS')
+                | Q(destination='FRIEND', name_destination=profile.user.username, specific_friends__in=[request.user])
+                | Q(profile=profile, destination='BIOGRAPHY', privacy='FRIENDS_EXC')
+                | Q(destination='FRIEND', name_destination=profile.user.username, privacy='FRIENDS_EXC')
+            ).exclude(
+                Q(friends_exc__in=[request.user]))
         else:
             posts = Post.objects.filter(
                 Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC') |
                 Q(destination='FRIEND', name_destination=profile.user.username, privacy='PUBLIC'))
+
         data = PostModelSerializer(posts, many=True).data
         return Response(data, status=status.HTTP_200_OK)
 

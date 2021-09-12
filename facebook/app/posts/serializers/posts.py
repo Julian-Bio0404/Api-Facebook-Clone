@@ -9,6 +9,7 @@ from users.models import User
 
 # Serializers
 from .media import ImageModelSerializer, VideoModelSerializer
+from users.serializers import UserModelSummarySerializer
 
 
 class SharedPostModelSerializer(serializers.ModelSerializer):
@@ -51,7 +52,7 @@ class PostModelSerializer(SharedPostModelSerializer):
             'location', 'tag_friends',
             'reactions', 'destination',
             'name_destination', 're_post',
-            'comments', 'shares'
+            'comments', 'shares' 
         ]
 
         read_only_fields = [
@@ -112,28 +113,7 @@ class PostModelSerializer(SharedPostModelSerializer):
         """Create a post."""
         user = self.context['user']
         profile = user.profile
-
-        # Add friends_except or specific_friends in the privacity configuration
-        if data['privacy'] == 'FRIENDS_EXC':
-            friends_except = []
-            for username in self.context['request'].data['friends_exc']:
-                try:
-                    friend = User.objects.get(username=username)
-                    friends_except.append(friend)
-                except User.DoesNotExist:
-                    raise serializers.ValidationError(
-                        f'The user with username {username} does not exist.')
-
-        elif data['privacy'] == 'SPECIFIC_FRIENDS':
-            specific_friends = []
-            for username in self.context['request'].data['specific_friends']:
-                try:
-                    friend = User.objects.get(username=username)
-                    specific_friends.append(friend)
-                except User.DoesNotExist:
-                    raise serializers.ValidationError(
-                        f'The user with username {username} does not exist.')
-
+        
         # Si viene un post en el contexto,
         # se crea un post con el repost
         if 'post' in self.context.keys():
@@ -166,13 +146,24 @@ class PostModelSerializer(SharedPostModelSerializer):
             except AttributeError:
                 post.save()
 
-        # Privacy
-        if friends_except:
-            for friend in friends_except:
-                post.friends_exc.add(friend)
-        elif specific_friends:
-            for friend in specific_friends:
-                post.specific_friends.add(friend)
+        # Add friends_except or specific_friends in the privacy configuration
+        if data['privacy'] == 'FRIENDS_EXC':
+            for username in self.context['request'].data['friends_exc']:
+                try:
+                    friend = User.objects.get(username=username)
+                    post.friends_exc.add(friend)
+                except User.DoesNotExist:
+                    raise serializers.ValidationError(
+                        f'The user with username {username} does not exist.')
+
+        elif data['privacy'] == 'SPECIFIC_FRIENDS':
+            for username in self.context['request'].data['specific_friends']:
+                try:
+                    friend = User.objects.get(username=username)
+                    post.specific_friends.add(friend)
+                except User.DoesNotExist:
+                    raise serializers.ValidationError(
+                        f'The user with username {username} does not exist.')
         post.save()
         return post
 

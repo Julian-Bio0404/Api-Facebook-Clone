@@ -46,7 +46,9 @@ class PostViewSet(mixins.CreateModelMixin,
 
         if self.action == 'list':
             queryset = Post.objects.filter(
-                Q(privacy='PUBLIC') | Q(user__in=friends, privacy='FRIENDS'))
+                Q(privacy='PUBLIC') | Q(user__in=friends, privacy='FRIENDS') 
+                | Q(user__in=friends, privacy='SPECIFIC_FRIENDS', specific_friends__in=[user])
+                | Q(specific_friends__in=[user])).exclude(Q(friends_exc__in=[user]))
         return queryset
 
     def get_permissions(self):

@@ -22,8 +22,18 @@ class IsFriend(BasePermission):
         
         if obj.privacy == 'PUBLIC':
             return True
-        else:
+        elif obj.privacy == 'FRIENDS':
             if request.user in friends or request.user == post_owner:
                 return True
             else:
                 return False
+        elif obj.privacy == 'SPECIFIC_FRIENDS':
+            if request.user in obj.specific_friends.all() or request.user == post_owner:
+                return True
+            else:
+                return False
+        elif obj.privacy == 'FRIENDS_EXC':
+            if request.user in obj.friends_exc.all():
+                return False
+            else: 
+                return True
