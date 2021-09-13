@@ -31,13 +31,11 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'photo', 'cover_photo',
             'about', 'hobby',
             'birth_date', 'origin_country',
-            'friends', 'followers',
-            'following', 'profiledetail'
+            'profiledetail'
         ]
 
         read_only_fields = [
-            'followers', 'following'
-            'profiledetail',
+            'profiledetail'
         ]
         
 

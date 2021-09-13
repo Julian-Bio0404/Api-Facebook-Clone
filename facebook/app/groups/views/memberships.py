@@ -64,7 +64,7 @@ class MembershipViewSet(mixins.ListModelMixin,
                 'invitation code': invitation}
             return Response(data, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
-            data = {'message': "The user doesn't exist"}
+            data = {'message': "The user doesn't exist."}
             return Response(data, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['post'])
@@ -88,4 +88,17 @@ class MembershipViewSet(mixins.ListModelMixin,
             return Response(data, status=status.HTTP_201_CREATED)
         except Invitation.DoesNotExist:
             data = {'message': 'Invalid invitation.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def confirm_membership(self, request, *args, **kwargs):
+        """Confirm group's membership by admin."""
+        if request.data['accepted'] == True:
+            membership =  self.get_object()
+            membership.is_active = True
+            membership.save()
+            data = MembershipModelSerializer(membership).data
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': 'You do not confirm the membership yet.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)

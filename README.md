@@ -76,11 +76,10 @@ REST API que simula todas las funcionalidades de Facebook
     + Listar posts de una página
   
 ## Features faltantes
-  - [ ] Aceptar membresía para unirse a un grupo :door::busts_in_silhouette: 
   - [ ] Expulsar miembros de un grupo :no_entry_sign::worried: 
   - [ ] Añadir admins a una Fbpage :trident:
   - [ ] Invitación a dar like a una Fbpage :heart:
-  - [ ] Añadir permisos a posts, grupos y paginas :warning:
+  - [ ] Añadir permisos a grupos y paginas :warning:
   - [ ] Eventos :date:
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:

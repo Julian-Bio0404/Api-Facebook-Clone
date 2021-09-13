@@ -53,7 +53,7 @@ class GroupeViewSet(mixins.CreateModelMixin,
     
     @action(detail=True, methods=['get'])
     def posts(self, request, *args, **kwargs):
-        """List all grop's a posts."""
+        """List all grop's posts."""
         group = self.get_object()
         posts = Post.objects.filter(
             destination='GROUP', name_destination=group.name)
