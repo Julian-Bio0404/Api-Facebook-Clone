@@ -40,6 +40,14 @@ class MembershipViewSet(mixins.ListModelMixin,
         """Return the group member by using the user's username."""
         return get_object_or_404(
             Membership, user__username=self.kwargs['pk'], group=self.group)
+    
+    def perform_destroy(self, instance):
+        """Delete a membership and invitation."""
+        user = instance.user
+        group = instance.group
+        invitation = get_object_or_404(Invitation, used_by=user, group=group)
+        invitation.delete()
+        instance.delete()
 
     def create(self, request, *args, **kwargs):
         """Handle member creation from invitation code."""
