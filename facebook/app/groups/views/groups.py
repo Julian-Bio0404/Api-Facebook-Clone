@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
+# Permissions
+from rest_framework.permissions import IsAuthenticated
+from groups.permissions import IsGroupAdmin
 
 # Serializers
 from groups.serializers import GroupModelSerializer
@@ -25,7 +28,10 @@ class GroupeViewSet(mixins.CreateModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
-    """ Group view set."""
+    """ Group view set.
+    Handle list, update, partial update, delete
+    groups and list group's posts.
+    """
 
     serializer_class = GroupModelSerializer
     lookup_field = 'slug_name'
@@ -42,6 +48,13 @@ class GroupeViewSet(mixins.CreateModelMixin,
             return queryset.filter(is_public=True)
         return queryset
 
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        permissions = [IsAuthenticated]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permissions.append(IsGroupAdmin)
+        return [permission() for permission in permissions]
+
     def perform_create(self, serializer):
         """Assign group admin."""
         group = serializer.save()
@@ -55,7 +68,17 @@ class GroupeViewSet(mixins.CreateModelMixin,
     def posts(self, request, *args, **kwargs):
         """List all grop's posts."""
         group = self.get_object()
+
+        if group.is_public == False:
+            try:
+                Membership.objects.get(
+                    user=request.user, group=group,
+                    is_active=True)
+            except Membership.DoesNotExist:
+                data = {'message': 'You do not has permission for this action.'}
+                return Response(data, status=status.HTTP_403_FORBIDDEN)
+
         posts = Post.objects.filter(
-            destination='GROUP', name_destination=group.name)
+            destination='GROUP', name_destination=group.slug_name)
         data = PostModelSerializer(posts, many=True).data
         return Response(data, status=status.HTTP_200_OK)
