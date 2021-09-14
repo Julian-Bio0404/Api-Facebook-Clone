@@ -67,6 +67,7 @@ REST API que simula todas las funcionalidades de Facebook
     + Listar miembros de un grupo
     + Confirmar una membresia
     + Eliminar miembro de un grupo
+    + Listar solicitudes de union del grupo
     
 ### :green_book: Fbpages
   + **Fbpage**
@@ -80,7 +81,7 @@ REST API que simula todas las funcionalidades de Facebook
 ## Features faltantes
   - [ ] Añadir admins a una Fbpage :trident:
   - [ ] Invitación a dar like a una Fbpage :heart:
-  - [ ] Añadir permisos a grupos y paginas :warning:
+  - [ ] Añadir permisos a paginas :warning:
   - [ ] Eventos :date:
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:

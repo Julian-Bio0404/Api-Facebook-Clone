@@ -75,7 +75,7 @@ class GroupeViewSet(mixins.CreateModelMixin,
                     user=request.user, group=group,
                     is_active=True)
             except Membership.DoesNotExist:
-                data = {'message': 'You do not has permission for this action.'}
+                data = {'message': 'You do not have permission to perform this action.'}
                 return Response(data, status=status.HTTP_403_FORBIDDEN)
 
         posts = Post.objects.filter(

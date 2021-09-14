@@ -9,6 +9,11 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import IsAuthenticated
+from groups.permissions import (IsMembershipAdmin, IsGroupMember, 
+                                IsSelfUserInvited, IsSelfUserInvitedOrAdmin)
+
 # Models
 from groups.models import Group, Membership, Invitation
 from users.models import User
@@ -35,6 +40,19 @@ class MembershipViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         """Return group members."""
         return Membership.objects.filter(group=self.group, is_active=True)
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        permissions = [IsAuthenticated]
+        if self.action in ['join_requests', 'confirm_membership']:
+            permissions.append(IsMembershipAdmin)
+        if self.action in ['create', 'retrieve', 'list', 'invitations']:
+            permissions.append(IsGroupMember)
+        if self.action in ['confirm_invitation']:
+            permissions.append(IsSelfUserInvited)
+        if self.action in ['destroy']:
+            permissions.append(IsSelfUserInvitedOrAdmin)
+        return [permission() for permission in permissions]
 
     def get_object(self):
         """Return the group member by using the user's username."""
@@ -97,6 +115,13 @@ class MembershipViewSet(mixins.ListModelMixin,
         except Invitation.DoesNotExist:
             data = {'message': 'Invalid invitation.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def join_requests(self, request, *args, **kwargs):
+        """List all memberships inactive."""
+        memberships = self.group.membership_set.filter(is_active=False)
+        data = MembershipModelSerializer(memberships, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def confirm_membership(self, request, *args, **kwargs):
