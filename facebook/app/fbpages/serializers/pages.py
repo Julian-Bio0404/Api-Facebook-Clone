@@ -4,14 +4,27 @@
 from rest_framework import serializers
 
 # Model
-from fbpages.models import Page, Category
+from fbpages.models import Category, Page, PageDetail
+
+
+class PageDetailModelSerializers(serializers.ModelSerializer):
+    """Page detail model serializer."""
+    
+    class Meta:
+        """Meta options."""
+        model = PageDetail
+        fields = [
+            'direction', 'phone_number', 
+            'web_site', 'social_links'
+        ]
 
 
 class PageModelSerializer(serializers.ModelSerializer):
     """Page model serializer."""
     
-    creator = serializers.StringRelatedField()
-    category = serializers.StringRelatedField()
+    creator = serializers.StringRelatedField(read_only=True)
+    category = serializers.StringRelatedField(read_only=True)
+    pagedetail = PageDetailModelSerializers(read_only=True)
 
     class Meta:
         """Meta options."""
@@ -19,12 +32,12 @@ class PageModelSerializer(serializers.ModelSerializer):
         fields = [
            'name', 'slug_name', 'creator',
            'photo', 'cover_photo', 'about',
-           'category', 'likes'
+           'pagedetail', 'category', 'likes'
         ]
 
         read_only_fields = [
-            'creator', 'category',
-            'likes'
+            'creator', 'pagedetail',
+            'category', 'likes'
         ]
 
     def create(self, data):
@@ -36,5 +49,5 @@ class PageModelSerializer(serializers.ModelSerializer):
         except Category.DoesNotExist:
             raise serializers.ValidationError('The category does not exist.')
         page = Page.objects.create(**data, creator=creator, category=category)
-        page.save()
+        PageDetail.objects.create(page=page)
         return page

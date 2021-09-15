@@ -42,7 +42,7 @@ class ProfileViewSet(mixins.ListModelMixin,
         """Assign permissions based on action."""
         if self.action in ['retrieve']:
             permissions = [AllowAny]
-        elif self.action in ['update', 'partial_update']:
+        elif self.action in ['update', 'partial_update', 'update_details']:
            permissions = [IsAuthenticated, IsProfileOwner]
         else:
             permissions = [IsAuthenticated]
@@ -70,8 +70,8 @@ class ProfileViewSet(mixins.ListModelMixin,
 
         if request.user.profile == profile:
             posts = Post.objects.filter(
-                Q(profile=profile, destination='BIOGRAPHY') |
-                Q(destination='FRIEND', name_destination=profile.user.username))
+                Q(profile=profile, destination='BIOGRAPHY')
+                | Q(destination='FRIEND', name_destination=profile.user.username))
         elif request.user in friends:
             posts = Post.objects.filter(
                 Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC')
@@ -85,8 +85,8 @@ class ProfileViewSet(mixins.ListModelMixin,
                 Q(friends_exc__in=[request.user]))
         else:
             posts = Post.objects.filter(
-                Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC') |
-                Q(destination='FRIEND', name_destination=profile.user.username, privacy='PUBLIC'))
+                Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC')
+                | Q(destination='FRIEND', name_destination=profile.user.username, privacy='PUBLIC'))
 
         data = PostModelSerializer(posts, many=True).data
         return Response(data, status=status.HTTP_200_OK)

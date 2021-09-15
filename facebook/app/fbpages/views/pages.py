@@ -8,8 +8,12 @@ from rest_framework.response import Response
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 
+# Permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from fbpages.permissions import IsCreatorOrAdminPage, IsCreatorPage
+
 # Serializers
-from fbpages.serializers import PageModelSerializer
+from fbpages.serializers import PageModelSerializer, PageDetailModelSerializers
 from posts.serializers import (CreatePagePostModelSerializer,
                                PostModelSerializer)
 from users.serializers import UserModelSummarySerializer
@@ -34,6 +38,19 @@ class PageViewSet(mixins.CreateModelMixin,
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('slug_name', 'name', 'category__name')
     ordering_fields = ('name', 'created')
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in ['retrieve', 'posts']:
+            permissions = [AllowAny]
+        elif self.action in [
+            'update', 'partial_update', 'update_details', 'create_post']:
+           permissions = [IsAuthenticated, IsCreatorOrAdminPage]
+        elif self.action in ['add_admin', 'remove_admin']:
+            permissions = [IsCreatorPage]
+        else:
+            permissions = [IsAuthenticated]
+        return[p() for p in permissions]
 
     def perform_destroy(self, instance):
         """Delete page and page's posts."""
@@ -63,6 +80,18 @@ class PageViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['put', 'patch'])
+    def update_details(self, request, *args, **kwargs):
+        """Update page details."""
+        page = self.get_object()
+        details = page.pagedetail
+        partial = request.method == 'PATCH'
+        serializer = PageDetailModelSerializers(
+            details, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def posts(self, request, *args, **kwargs):

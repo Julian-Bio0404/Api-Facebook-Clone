@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from fbpages.models import Category, Page
+from fbpages.models import Category, Page, PageDetail
 
 
 @admin.register(Category)
@@ -28,3 +28,17 @@ class PageAdmin(admin.ModelAdmin):
 
     search_fields = ['name']
     list_filter = ['category']
+
+
+@admin.register(PageDetail)
+class PageDetail(admin.ModelAdmin):
+    """Page detail model admin."""
+
+    list_display = [
+        'page', 'direction', 
+        'phone_number', 'web_site',
+        'social_links'
+    ]
+
+    search_fields = ['page']
+    list_filter = ['page__category']
