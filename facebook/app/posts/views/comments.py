@@ -6,6 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import IsAuthenticated
+from posts.permissions import IsCommentOwner, IsCommentOrPostOwner, IsFriendPostOwner
+
 # Models
 from posts.models import Comment, Post, ReactionComment
 
@@ -23,7 +27,8 @@ class CommentViewSet(mixins.CreateModelMixin,
                      viewsets.GenericViewSet):
     """ Comment view set.
 
-    Handle list, create, update and destroy comment.
+    Handle list, create, detail, update, destroy, 
+    react comment or list comment's reactions.
     """
     
     serializer_class = CommentModelSerializer
@@ -44,6 +49,16 @@ class CommentViewSet(mixins.CreateModelMixin,
         """Return post's comments."""
         comments = Comment.objects.filter(post=self.object)
         return comments
+
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        if self.action in ['create', 'retrieve', 'list', 'react', 'reactions']:
+            permissions = [IsAuthenticated, IsFriendPostOwner]
+        elif self.action in ['update']:
+           permissions = [IsAuthenticated, IsCommentOwner]
+        elif self.action in ['destroy']:
+            permissions = [IsAuthenticated, IsCommentOrPostOwner]
+        return[p() for p in permissions]
     
     def create(self, request, *args, **kwargs):
         """Handles comment creation."""

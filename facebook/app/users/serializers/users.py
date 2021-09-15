@@ -82,7 +82,7 @@ class UserSignUpSerializer(serializers.Serializer):
         regex=r"^\+1?\d{1,4}[ ]\d{10}$",
         message='Phone number must be entered in the format: +99 9999999999. Up to indicative + 10 digits allowed.')
 
-    phone_number = serializers.CharField(validators=[phone_regex])
+    phone_number = serializers.CharField(validators=[phone_regex], required=False)
 
     # Password
     password = serializers.CharField(min_length=8, max_length=64)
