@@ -79,7 +79,6 @@ REST API que simula todas las funcionalidades de Facebook
     + Listar posts de una página
   
 ## Features faltantes
-  - [ ] Añadir admins a una Fbpage :trident:
   - [ ] Invitación a dar like a una Fbpage :heart:
   - [ ] Añadir permisos a paginas :warning:
   - [ ] Eventos :date:

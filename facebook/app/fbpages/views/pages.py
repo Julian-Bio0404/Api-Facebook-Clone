@@ -17,6 +17,7 @@ from users.serializers import UserModelSummarySerializer
 # Models
 from fbpages.models import Page
 from posts.models import Post
+from users.models import User
 
 
 class PageViewSet(mixins.CreateModelMixin,
@@ -37,7 +38,7 @@ class PageViewSet(mixins.CreateModelMixin,
     def perform_destroy(self, instance):
         """Delete page and page's posts."""
         posts = Post.objects.filter(
-            destination='PAGE', name_destination=instance.name)
+            destination='PAGE', name_destination=instance.slug_name)
         posts.delete()
         instance.delete()
 
@@ -58,7 +59,7 @@ class PageViewSet(mixins.CreateModelMixin,
             data=request.data,
             context={
                 'user': request.user, 'destination': 'PAGE',
-                'name_destination': page.name, 'privacy': 'PUBLIC'})
+                'name_destination': page.slug_name, 'privacy': 'PUBLIC'})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -68,7 +69,7 @@ class PageViewSet(mixins.CreateModelMixin,
         """List all page's posts."""
         page = self.get_object()
         posts = Post.objects.filter(
-            destination='PAGE', name_destination=page.name)
+            destination='PAGE', name_destination=page.slug_name)
         data = PostModelSerializer(posts, many=True).data
         return Response(data, status=status.HTTP_200_OK)
 
@@ -95,4 +96,50 @@ class PageViewSet(mixins.CreateModelMixin,
             page.page_followers.remove(user)
             data = {
                 'message': f'you stopped following to {page.name}'}
+        page.save()
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def add_admin(self, request, *args, **kwargs):
+        """Add admin to a page."""
+        page = self.get_object()
+
+        if 'username' in request.data.keys():
+            try:
+                new_admin = User.objects.get(username=request.data['username'])
+            except User.DoesNotExist:
+                data = {'message': 'User does not exist.'}
+                return Response(data, status=status.HTTP_404_NOT_FOUND)
+            page.admins.add(new_admin)
+            page.save()
+            admins = UserModelSummarySerializer(page.admins, many=True).data
+            data = {
+                'message': f'{new_admin.username} is a new admin of {page.name}.',
+                'admins': admins}
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': 'You must send a username.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def remove_admin(self, request, *args, **kwargs):
+        """Remove admin from a page."""
+        page = self.get_object()
+
+        if 'username' in request.data.keys():
+            try:
+                admin = User.objects.get(username=request.data['username'])
+            except User.DoesNotExist:
+                data = {'message': 'User does not exist.'}
+                return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+            if admin in page.admins.all():
+                page.admins.remove(admin)
+                page.save()
+                data = {'message': f'{admin.username} admin removed.'}
+            else:
+                data = {'message': 'User is not a admin.'}
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': 'You must send a username.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)

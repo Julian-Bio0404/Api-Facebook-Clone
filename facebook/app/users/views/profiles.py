@@ -120,6 +120,8 @@ class ProfileViewSet(mixins.ListModelMixin,
             user.profile.following.remove(user)
             data = {
                 'message': f'you stopped following to {profile.user.username}'}
+        profile.save()
+        user.save()
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
