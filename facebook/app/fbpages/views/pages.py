@@ -13,9 +13,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from fbpages.permissions import IsCreatorOrAdminPage, IsCreatorPage
 
 # Serializers
-from fbpages.serializers import PageModelSerializer, PageDetailModelSerializers
+from fbpages.serializers import (CreatePageInvitation, PageModelSerializer, 
+                                 PageDetailModelSerializers, PageInvitationSerializer)
+
 from posts.serializers import (CreatePagePostModelSerializer,
                                PostModelSerializer)
+
 from users.serializers import UserModelSummarySerializer
 
 # Models
@@ -172,3 +175,14 @@ class PageViewSet(mixins.CreateModelMixin,
         else:
             data = {'message': 'You must send a username.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['post'])
+    def invitation(self, request, *args, **kwargs):
+        """Handle the sending of page invitations."""
+        page = self.get_object()
+        serializer = CreatePageInvitation(
+            data=request.data, context={'page': page, 'request': request})
+        serializer.is_valid(raise_exception=True)
+        page_invitation = serializer.save()
+        data = PageInvitationSerializer(page_invitation).data
+        return Response(data, status=status.HTTP_201_CREATED)

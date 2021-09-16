@@ -22,9 +22,11 @@ class PageInvitation(FbModel):
         'users.User', on_delete=models.CASCADE,
         help_text='User that used the invitation.',
         null=True, related_name='guest_user')
+    
+    page = models.ForeignKey('fbpages.Page', on_delete=models.CASCADE, null=True)
 
     used = models.BooleanField(default=False)
 
     def __str__(self):
-        """Return code and group."""
-        return "from: {}, to: {}".format(self.sent_by.username, self.used_by.username)
+        """Return inviting_user and guest_user."""
+        return "from: {}, to: {}".format(self.inviting_user, self.guest_user)

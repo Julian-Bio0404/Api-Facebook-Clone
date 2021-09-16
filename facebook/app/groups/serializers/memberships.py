@@ -25,7 +25,10 @@ class MembershipModelSerializer(serializers.ModelSerializer):
             'invited_by', 'invited_at'
         ]
 
-        read_only_fields = ['user']
+        read_only_fields = [
+            'user', 'invited_at', 
+            'is_admin'
+        ]
 
 
 class AddMemberSerializer(serializers.Serializer):

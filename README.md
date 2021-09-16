@@ -79,9 +79,9 @@ REST API que simula todas las funcionalidades de Facebook
     + Crear un post desde una página
     + Listar posts de una página
     + Añadir o eliminar admin de una página
+    + Invitación a dar like a una página
   
 ## Features faltantes
-  - [ ] Invitación a dar like a una Fbpage :heart:
   - [ ] Eventos :date:
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:
