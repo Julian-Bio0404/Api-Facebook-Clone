@@ -2,8 +2,12 @@
 
 # Django REST framework
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+
+# Permissions
+from rest_framework.permissions import IsAuthenticated
+from posts.permissions import IsSavedOwner
 
 # Models
 from posts.models import CategorySaved, Post, Saved
@@ -12,7 +16,8 @@ from posts.models import CategorySaved, Post, Saved
 from posts.serializers import (CategorySavedModelSerializer,
                                SavedPostModelSerializer)
     
-    
+
+@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def create_category(request):
     """Create Saved category."""
@@ -30,6 +35,7 @@ def create_category(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@permission_classes([IsSavedOwner])
 @api_view(['GET', 'PUT', 'DELETE'])
 def retrieve_category(request, pk=None):
     """detail, update or delete a saved category."""
@@ -53,8 +59,9 @@ def retrieve_category(request, pk=None):
         posts_saved.delete()
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
 
+
+@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def create_saved(request, pk=None):
     """Handle post saved creation."""
@@ -82,6 +89,7 @@ def create_saved(request, pk=None):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@permission_classes([IsSavedOwner])
 @api_view(['GET', 'DELETE'])
 def retrieve_saved(request, pk=None):
     """detail, update or delete a saved category."""
@@ -99,6 +107,7 @@ def retrieve_saved(request, pk=None):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def list_saved(request):
     """List all post saved of user."""
