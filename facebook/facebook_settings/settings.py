@@ -46,7 +46,8 @@ LOCAL_APPS = [
     'app.posts',
     'app.groups',
     'app.fbpages',
-    'app.notifications'
+    'app.notifications',
+    'app.chats'
 ]
 
 THIRD_PARTY_APPS = [
