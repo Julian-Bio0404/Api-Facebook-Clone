@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from notifications.models import Notification
+from app.notifications.models import Notification
 
 
 @admin.register(Notification)

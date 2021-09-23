@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 # Models
-from users.models import Profile, ProfileDetail
+from app.users.models import Profile, ProfileDetail
 
 
 class ProfileDetailModelSerializer(serializers.ModelSerializer):

@@ -8,15 +8,15 @@ from rest_framework.response import Response
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from posts.permissions import IsCommentOwner, IsCommentOrPostOwner, IsFriendPostOwner
+from app.posts.permissions import IsCommentOwner, IsCommentOrPostOwner, IsFriendPostOwner
 
 # Models
-from posts.models import Comment, Post, ReactionComment
+from app.posts.models import Comment, Post, ReactionComment
 
 # Serializers
-from posts.serializers import (CommentModelSerializer, 
-                               ReactionCommentModelSerializer,
-                               ReactionCommentModelSummarySerializer)
+from app.posts.serializers import (CommentModelSerializer,
+                                   ReactionCommentModelSerializer,
+                                   ReactionCommentModelSummarySerializer)
 
 
 class CommentViewSet(mixins.CreateModelMixin,
@@ -25,8 +25,8 @@ class CommentViewSet(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
                      mixins.DestroyModelMixin,
                      viewsets.GenericViewSet):
-    """ Comment view set.
-
+    """
+    Comment view set.
     Handle list, create, detail, update, destroy, 
     react comment or list comment's reactions.
     """

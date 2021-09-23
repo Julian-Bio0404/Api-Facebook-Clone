@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class User(FbModel, AbstractUser):

@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from groups.models import Group, Membership, Invitation
+from app.groups.models import Group, Membership, Invitation
 
 
 @admin.register(Group)

@@ -9,9 +9,9 @@ from django.urls import include, path
 urlpatterns = [
     
     path('admin/', admin.site.urls),
-    path('', include(('users.urls', 'users'), namespace='users')),
-    path('', include(('posts.urls', 'posts'), namespace='posts')),
-    path('', include(('groups.urls', 'groups'), namespace='groups')),
-    path('', include(('fbpages.urls', 'pages'), namespace='pages')),
+    path('', include(('app.users.urls', 'users'), namespace='users')),
+    path('', include(('app.posts.urls', 'posts'), namespace='posts')),
+    path('', include(('app.groups.urls', 'groups'), namespace='groups')),
+    path('', include(('app.fbpages.urls', 'pages'), namespace='pages')),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

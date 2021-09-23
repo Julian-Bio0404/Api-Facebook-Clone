@@ -4,12 +4,12 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class Profile(FbModel):
-    """Profile model.
-
+    """
+    Profile model.
     A profile holds a users public data like,
     photo and features.
     """

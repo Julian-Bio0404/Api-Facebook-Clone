@@ -4,12 +4,12 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class Shared(FbModel):
-    """ Shared model.
-
+    """
+    Shared model.
     holds the user who reposted and the repost
     """
 

@@ -4,12 +4,12 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class Group(FbModel):
-    """Group model.
-
+    """
+    Group model.
     A group is where users will be able 
     to share content between members.
     """

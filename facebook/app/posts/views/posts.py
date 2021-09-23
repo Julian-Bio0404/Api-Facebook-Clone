@@ -13,13 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 from app.posts.permissions import IsFriend, IsPostOwner
 
 # Models
-from posts.models import Post, ReactionPost, Shared
+from app.posts.models import Post, ReactionPost, Shared
 
 # Serializers
-from posts.serializers import (PostModelSerializer,
-                               ReactionPostModelSerializer,
-                               ReactionPostModelSummarySerializer,
-                               SharedModelSerializer)
+from app.posts.serializers import (PostModelSerializer,
+                                   ReactionPostModelSerializer,
+                                   ReactionPostModelSummarySerializer,
+                                   SharedModelSerializer)
 
 
 class PostViewSet(mixins.CreateModelMixin,
@@ -28,8 +28,8 @@ class PostViewSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
-    """Post view set.
-
+    """
+    Post view set.
     Handle list, create, update, destroy,
     sharing, list shares, react to a post
     and list post's reactions.

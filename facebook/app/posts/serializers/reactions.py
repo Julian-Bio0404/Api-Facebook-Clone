@@ -4,11 +4,11 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import ReactionComment, ReactionPost
+from app.posts.models import ReactionComment, ReactionPost
 
 # Serializers
-from users.serializers import UserModelSummarySerializer
-from posts.serializers import CommentModelSerializer, PostModelSerializer
+from app.posts.serializers import CommentModelSerializer, PostModelSerializer
+from app.users.serializers import UserModelSummarySerializer
 
 
 class ReactionPostModelSerializer(serializers.ModelSerializer):

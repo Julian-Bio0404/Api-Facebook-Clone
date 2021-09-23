@@ -7,15 +7,15 @@ from rest_framework.response import Response
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from posts.permissions import IsSavedOwner
+from app.posts.permissions import IsSavedOwner
 
 # Models
-from posts.models import CategorySaved, Post, Saved
+from app.posts.models import CategorySaved, Post, Saved
 
 # Serializers
-from posts.serializers import (CategorySavedModelSerializer,
-                               SavedPostModelSerializer)
-    
+from app.posts.serializers import (CategorySavedModelSerializer,
+                                   SavedPostModelSerializer)
+
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])

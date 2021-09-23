@@ -13,22 +13,22 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from app.users.permissions import IsProfileOwner
 
 # Models
-from users.models import Profile
-from posts.models import Post
+from app.posts.models import Post
+from app.users.models import Profile
 
 # Serializers
-from posts.serializers import PostModelSerializer
-from users.serializers import (ProfileDetailModelSerializer,
-                               ProfileModelSerializer,
-                               UserModelSummarySerializer)
+from app.posts.serializers import PostModelSerializer
+from app.users.serializers import (ProfileDetailModelSerializer,
+                                   ProfileModelSerializer,
+                                   UserModelSummarySerializer)
 
 
 class ProfileViewSet(mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.UpdateModelMixin,
                      viewsets.GenericViewSet):
-    """Profile view set.
-
+    """
+    Profile view set.
     Handle list profile, update profile, 
     update profile details, follow or unfollow 
     users and list followers, following and friends.

@@ -11,15 +11,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from groups.permissions import IsGroupAdmin
-
-# Serializers
-from groups.serializers import GroupModelSerializer
-from posts.serializers import PostModelSerializer
+from app.groups.permissions import IsGroupAdmin
 
 # Models
-from groups.models import Group, Membership
-from posts.models import Post
+from app.groups.models import Group, Membership
+from app.posts.models import Post
+
+# Serializers
+from app.groups.serializers import GroupModelSerializer
+from app.posts.serializers import PostModelSerializer
 
 
 class GroupeViewSet(mixins.CreateModelMixin,
@@ -28,7 +28,8 @@ class GroupeViewSet(mixins.CreateModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
-    """ Group view set.
+    """
+    Group view set.
     Handle list, update, partial update, delete
     groups and list group's posts.
     """

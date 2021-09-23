@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 # Model
-from fbpages.models import Category, Page, PageDetail
+from app.fbpages.models import Category, Page, PageDetail
 
 
 class PageDetailModelSerializers(serializers.ModelSerializer):

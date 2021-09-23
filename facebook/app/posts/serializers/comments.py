@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import Comment
+from app.posts.models import Comment
 
 
 class CommentModelSerializer(serializers.ModelSerializer):

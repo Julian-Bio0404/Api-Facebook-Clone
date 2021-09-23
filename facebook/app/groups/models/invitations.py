@@ -4,14 +4,15 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 # Managers
-from groups.managers.invitations import InvitationManager
+from app.groups.managers.invitations import InvitationManager
 
 
 class Invitation(FbModel):
-    """Group invitation.
+    """
+    Group invitation.
 
     A group invitation is a random text that acts as 
     a unique code that grants access to a specific group.

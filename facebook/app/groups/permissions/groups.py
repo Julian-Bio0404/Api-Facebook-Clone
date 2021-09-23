@@ -4,7 +4,7 @@
 from rest_framework.permissions import BasePermission
 
 # Models
-from groups.models import Membership
+from app.groups.models import Membership
 
 
 class IsGroupAdmin(BasePermission):

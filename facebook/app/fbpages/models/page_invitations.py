@@ -4,12 +4,12 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class PageInvitation(FbModel):
-    """Page Invitation model.
-
+    """
+    Page Invitation model.
     A page invitation is an invitation from 
     an user to another to follow a page.
     """

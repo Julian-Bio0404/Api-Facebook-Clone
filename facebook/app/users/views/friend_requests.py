@@ -7,16 +7,16 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 # Permissions
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from app.users.permissions import IsRequestedUser
 
 # Models
-from users.models import FriendRequest, User
+from app.users.models import FriendRequest, User
 
 # Serializers
-from users.serializers import (AcceptFriendRequestSerializer,
-                               FriendRequestModelSerializer,
-                               ProfileModelSerializer)
+from app.users.serializers import (AcceptFriendRequestSerializer,
+                                   FriendRequestModelSerializer,
+                                   ProfileModelSerializer)
 
 
 class FriendRequestViewSet(mixins.CreateModelMixin,
@@ -24,8 +24,8 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
                            mixins.RetrieveModelMixin,
                            mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    """Friend request view set.
-
+    """
+    Friend request view set.
     Handle the sending, acceptance and list of friend requests.
     """
 

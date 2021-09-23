@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import Picture, Video
+from app.posts.models import Picture, Video
 
 
 class ImageModelSerializer(serializers.ModelSerializer):

@@ -4,10 +4,10 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import Saved, CategorySaved
+from app.posts.models import Saved, CategorySaved
 
 # Serializers
-from posts.serializers import PostModelSerializer
+from app.posts.serializers import PostModelSerializer
 
 
 class CategorySavedModelSerializer(serializers.ModelSerializer):

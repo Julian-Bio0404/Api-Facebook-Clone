@@ -21,21 +21,21 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from app.users.permissions import IsAccountOwner
 
 # Models
-from users.models import User
+from app.users.models import User
 
 # Serializers
-from users.serializers import (AccountVerificationSerializer,
-                               RestorePasswordSerializer,
-                               UpdatePasswordSerializer, UserLoginSerializer,
-                               UserModelSerializer, UserSignUpSerializer)
+from app.users.serializers import (AccountVerificationSerializer,
+                                   RestorePasswordSerializer,
+                                   UpdatePasswordSerializer, UserLoginSerializer,
+                                   UserModelSerializer, UserSignUpSerializer)
 
 
 class UserViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
-    """User view set.
-
+    """
+    User view set.
     Handle signup, login and account verification,
     refresh token, restore and update password.
     """

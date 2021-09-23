@@ -1,16 +1,12 @@
 """Users serializers."""
 
 # Utilities
-from datetime import timedelta
 import jwt
 
 # Django
 from django.conf import settings
 from django.contrib.auth import authenticate, password_validation
-from django.core.mail import EmailMultiAlternatives
 from django.core.validators import RegexValidator
-from django.template.loader import render_to_string
-from django.utils import timezone
 
 # Django REST Framework
 from rest_framework import serializers
@@ -18,10 +14,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
 # Models
-from users.models import Profile, ProfileDetail, User
+from app.users.models import Profile, ProfileDetail, User
 
 # Serializers
 from .profiles import ProfileModelSerializer, ProfileModelSummarySerializer
+
+# Tasks
+from taskapp.tasks import send_confirmation_email
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -33,18 +32,14 @@ class UserModelSerializer(serializers.ModelSerializer):
         """Meta options."""
         model = User
         fields = [
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'phone_number',
-            'profile',
+            'username', 'first_name',
+            'last_name', 'email',
+            'phone_number', 'profile',
             'is_verified'
         ]
 
         read_only_fields = [
-            'profile',
-            'is_verified'
+            'profile', 'is_verified'
         ]
 
 
@@ -57,21 +52,19 @@ class UserModelSummarySerializer(UserModelSerializer):
         """Meta options."""
         model = User
         fields = [
-            'first_name',
-            'last_name',
+            'first_name', 'last_name',
             'profile'
         ]
 
 
 class UserSignUpSerializer(serializers.Serializer):
-    """User signup serializer.
-
+    """
+    User signup serializer.
     Handle sign up data validation and user & profile creation.
     """
 
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
+        validators=[UniqueValidator(queryset=User.objects.all())])
 
     username = serializers.CharField(
         min_length=4, max_length=25,
@@ -105,41 +98,16 @@ class UserSignUpSerializer(serializers.Serializer):
     def create(self, data):
         """Handle user and profile creation"""
         data.pop('password_confirmation')
-        user = User.objects.create_user(**data, is_verified=False)
+        user = User.objects.create_user(**data)
         Profile.objects.create(user=user)
         ProfileDetail.objects.create(user=user, profile=user.profile)
-        self.send_confirmation_email(user)
+        send_confirmation_email.delay(user_pk=user.pk)
         return user
-
-    def gen_verification_token(self, user):
-        """Create JWT token that the user can use to verify its account."""
-        exp_date = timezone.now() + timedelta(days=2)
-        payload = {
-            'user': user.username,
-            'exp': int(exp_date.timestamp()),
-            'type': 'email_confirmation'
-        }
-        # Generacion del token
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        return token
-
-    def send_confirmation_email(self, user):
-        """Send account verification link to given user."""
-        verification_token = self.gen_verification_token(user)
-        subject = 'Welcome @{}! Verify your account'.format(user.username)
-        from_email = 'Facebook <Facebook.com>'
-        content = render_to_string(
-            'account_verification.html',
-            {'token': verification_token, 'user': user})
-        msg = EmailMultiAlternatives(
-            subject, content, from_email, [user.email])
-        msg.attach_alternative(content, 'text/html')
-        msg.send()
 
 
 class UserLoginSerializer(serializers.Serializer):
-    """User login serializer.
-
+    """
+    User login serializer.
     Handle the login request data.
     """
     

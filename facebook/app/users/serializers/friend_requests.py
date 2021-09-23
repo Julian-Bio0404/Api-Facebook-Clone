@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 # Models
-from users.models import FriendRequest
+from app.users.models import FriendRequest
 
 # Serializers
 from .users import UserModelSummarySerializer

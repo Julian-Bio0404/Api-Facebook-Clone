@@ -4,17 +4,16 @@
 from rest_framework import serializers
 
 # Models
-from posts.models import Picture, Post, Shared, Video
-from users.models import User
+from app.posts.models import Picture, Post, Shared, Video
+from app.users.models import User
 
 # Serializers
 from .media import ImageModelSerializer, VideoModelSerializer
-from users.serializers import UserModelSummarySerializer
 
 
 class SharedPostModelSerializer(serializers.ModelSerializer):
-    """Shared post model serializer
-
+    """
+    Shared post model serializer.
     Serialize a repost.
     """
 
@@ -63,7 +62,8 @@ class PostModelSerializer(SharedPostModelSerializer):
         ]
 
     def validate(self, data):
-        """verify privacy and that only the about, destination and 
+        """
+        verify privacy and that only the about, destination and 
         name destination fields are present if it is a repost.
         If it is a post, verify that about, picture or video are present.
         """

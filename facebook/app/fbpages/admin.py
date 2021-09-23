@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from fbpages.models import Category, Page, PageDetail, PageInvitation
+from app.fbpages.models import Category, Page, PageDetail, PageInvitation
 
 
 @admin.register(Category)

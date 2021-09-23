@@ -11,15 +11,15 @@ from rest_framework.response import Response
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from groups.permissions import (IsMembershipAdmin, IsGroupMember, 
+from app.groups.permissions import (IsMembershipAdmin, IsGroupMember, 
                                 IsSelfUserInvited, IsSelfUserInvitedOrAdmin)
 
 # Models
-from groups.models import Group, Membership, Invitation
-from users.models import User
+from app.groups.models import Group, Membership, Invitation
+from app.users.models import User
 
 # Serializers
-from groups.serializers import MembershipModelSerializer, AddMemberSerializer
+from app.groups.serializers import MembershipModelSerializer, AddMemberSerializer
 
 
 class MembershipViewSet(mixins.ListModelMixin,
@@ -27,7 +27,11 @@ class MembershipViewSet(mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    """Group membership view set."""
+    """
+    Group membership view set.
+    Handle list, create, detail, delete of 
+    membership and create or confirm invitation.
+    """
 
     serializer_class = MembershipModelSerializer
 

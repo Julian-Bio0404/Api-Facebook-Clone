@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 # Models
-from users.models import FriendRequest, User, Profile, ProfileDetail
+from app.users.models import FriendRequest, User, Profile, ProfileDetail
 
 
 @admin.register(User)

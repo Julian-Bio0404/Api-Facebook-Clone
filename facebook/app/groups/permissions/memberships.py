@@ -4,11 +4,12 @@
 from rest_framework.permissions import BasePermission
 
 # Models
-from groups.models import Invitation, Membership
+from app.groups.models import Invitation, Membership
 
 
 class IsGroupMember(BasePermission):
-    """Allow access only to group members.
+    """
+    Allow access only to group members.
     Expect that the views implementing this permission
     have a `group` attribute assigned.
     """
@@ -56,7 +57,8 @@ class IsMembershipAdmin(BasePermission):
 
 
 class IsSelfUserInvitedOrAdmin(BasePermission):
-    """Allow access only to 
+    """
+    Allow access only to 
     group  admin or to user invited.
     """
     

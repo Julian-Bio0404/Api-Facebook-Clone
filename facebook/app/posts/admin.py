@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 # Models
-from posts.models import (CategorySaved,
+from app.posts.models import (CategorySaved,
                           Comment, Post,
                           ReactionComment,
                           ReactionPost,

@@ -4,8 +4,8 @@
 from rest_framework import serializers
 
 # Models
-from fbpages.models import PageInvitation
-from users.models import User
+from app.fbpages.models import PageInvitation
+from app.users.models import User
 
 
 class PageInvitationSerializer(serializers.ModelSerializer):

@@ -1,11 +1,10 @@
-"""Users app."""
+"""Task app."""
 
 # Django
 from django.apps import AppConfig
 
 
-class UsersConfig(AppConfig):
-    """Users app config."""
-    
+class TaskappConfig(AppConfig):
+    """Task app config."""
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'app.users'
+    name = 'taskapp'

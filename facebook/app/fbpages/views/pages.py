@@ -10,21 +10,21 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from fbpages.permissions import IsCreatorOrAdminPage, IsCreatorPage
+from app.fbpages.permissions import IsCreatorOrAdminPage, IsCreatorPage
 
 # Serializers
-from fbpages.serializers import (CreatePageInvitation, PageModelSerializer, 
-                                 PageDetailModelSerializers, PageInvitationSerializer)
+from app.fbpages.serializers import (CreatePageInvitation, PageModelSerializer,
+                                     PageDetailModelSerializers, PageInvitationSerializer)
 
-from posts.serializers import (CreatePagePostModelSerializer,
-                               PostModelSerializer)
+from app.posts.serializers import (CreatePagePostModelSerializer,
+                                   PostModelSerializer)
 
-from users.serializers import UserModelSummarySerializer
+from app.users.serializers import UserModelSummarySerializer
 
 # Models
-from fbpages.models import Page
-from posts.models import Post
-from users.models import User
+from app.fbpages.models import Page
+from app.posts.models import Post
+from app.users.models import User
 
 
 class PageViewSet(mixins.CreateModelMixin,

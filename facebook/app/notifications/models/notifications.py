@@ -4,7 +4,7 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class Notification(FbModel):

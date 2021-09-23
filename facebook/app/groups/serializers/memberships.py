@@ -4,10 +4,10 @@
 from rest_framework import serializers
 
 # Models
-from groups.models import Membership, Invitation
+from app.groups.models import Membership, Invitation
 
 # Serializers
-from users.serializers import UserModelSerializer
+from app.users.serializers import UserModelSerializer
 
 
 class MembershipModelSerializer(serializers.ModelSerializer):
@@ -32,8 +32,8 @@ class MembershipModelSerializer(serializers.ModelSerializer):
 
 
 class AddMemberSerializer(serializers.Serializer):
-    """Add member serializer.
-
+    """
+    Add member serializer.
     Handle the addition of a new member to a group.
     """
 

@@ -4,12 +4,12 @@
 from django.db import models
 
 # Utilities
-from utils.models import FbModel
+from app.utils.models import FbModel
 
 
 class Membership(FbModel):
-    """Membership model.
-
+    """
+    Membership model.
     A membership is the model that holds the 
     relationship between a user and a group.
     """
