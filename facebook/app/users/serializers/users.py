@@ -20,7 +20,7 @@ from app.users.models import Profile, ProfileDetail, User
 from .profiles import ProfileModelSerializer, ProfileModelSummarySerializer
 
 # Tasks
-from taskapp.tasks import send_confirmation_email
+from taskapp.tasks import send_confirmation_email, send_restore_password_email
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -157,6 +157,39 @@ class AccountVerificationSerializer(serializers.Serializer):
         user = User.objects.get(username=payload['user'])
         user.is_verified = True
         user.save()
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    """Refresh Token serializer for account verification."""
+
+    email = serializers.EmailField()
+    password = serializers.CharField(min_length=8, max_length=64)
+
+    def validate(self, data):
+        """Check credentials.."""
+        user = authenticate(username=data['email'], password=data['password'])
+
+        if not user:
+            raise serializers.ValidationError('Invalid credentials.')
+        if user.is_verified == True:
+            raise serializers.ValidationError('You are already verified.')
+        send_confirmation_email.delay(user_pk=user.pk)
+        return user
+
+
+class TokenRestorePasswordSerializer(serializers.Serializer):
+    """Token restore password serializer."""
+
+    email = serializers.EmailField()
+
+    def validate_email(self, data):
+        """Check user's email."""
+        try:
+            user = User.objects.get(email=data)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User does not exist.')
+        send_restore_password_email.delay(user_pk=user.pk)
+        return user
 
 
 class RestorePasswordSerializer(serializers.Serializer):
