@@ -1,6 +1,7 @@
 """Profiles views."""
 
 # Django
+from facebook.app.users.permissions import friend_request
 from django.db.models import Q
 
 # Django REST framework
@@ -14,7 +15,7 @@ from app.users.permissions import IsProfileOwner
 
 # Models
 from app.posts.models import Post
-from app.users.models import Profile
+from app.users.models import Profile, FriendRequest
 
 # Serializers
 from app.posts.serializers import PostModelSerializer
@@ -29,9 +30,9 @@ class ProfileViewSet(mixins.ListModelMixin,
                      viewsets.GenericViewSet):
     """
     Profile view set.
-    Handle list profile, update profile, 
-    update profile details, follow or unfollow 
-    users and list followers, following and friends.
+    Handle list profile, update profile, update profile details, 
+    follow or unfollow users, remove a friend, and list followers, 
+    following and friends.
     """
 
     queryset = Profile.objects.filter(user__is_verified=True)
@@ -139,3 +140,23 @@ class ProfileViewSet(mixins.ListModelMixin,
         following = profile.following
         serializer = UserModelSummarySerializer(following, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def delete_friend(self, request, *args, **kwargs):
+        """Remove a friend."""
+        user, profile = request.user, self.get_object()
+        if user in profile.friends.all():
+            profile.friends.remove(user)
+            user.profile.friends.remove(profile.user)
+            profile.save()
+            user.profile.save()
+            friend_request = FriendRequest.objects.get(
+                requesting_user__in=[user, profile.user], 
+                requested_user__in=[user, profile.user])
+            friend_request.delete()
+            data = {
+                'message': f'you removed {profile.user.username} from your friends list.'}
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': f'You are not friend of {profile.user.username}.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)

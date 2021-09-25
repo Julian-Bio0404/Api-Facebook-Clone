@@ -14,9 +14,8 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'profiles', ProfileViewSet, basename='profiles')
 router.register(r'profiles/(?P<username>[a-zA-Z0-9]+)/friend_requests', 
-                FriendRequestViewSet, basename='comments')
+                FriendRequestViewSet, basename='friend_request')
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('', include(router.urls))
 ]

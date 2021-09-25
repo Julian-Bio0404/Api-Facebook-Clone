@@ -15,8 +15,7 @@ from app.users.models import FriendRequest, User
 
 # Serializers
 from app.users.serializers import (AcceptFriendRequestSerializer,
-                                   FriendRequestModelSerializer,
-                                   ProfileModelSerializer)
+                                   FriendRequestModelSerializer)
 
 
 class FriendRequestViewSet(mixins.CreateModelMixin,
@@ -29,7 +28,7 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
     Handle the sending, acceptance and list of friend requests.
     """
 
-    serializer_class = ProfileModelSerializer
+    serializer_class = FriendRequestModelSerializer
 
     def get_permissions(self):
         """Assign permissions based on action."""
@@ -47,7 +46,8 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
 
     def get_queryset(self):
         """Return the friend's request of user."""
-        friend_request = FriendRequest.objects.filter(requested_user=self.user)
+        friend_request = FriendRequest.objects.filter(
+            requested_user=self.user)
         return friend_request
 
     def create(self, request, *args, **kwargs):
@@ -58,13 +58,7 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    def retrieve(self, request, *args, **kwargs):
-        """Friend request details."""
-        friend_request = self.get_object()
-        serializer = FriendRequestModelSerializer(friend_request)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def list(self, request, *args, **kwargs):
         """List all user's friend request."""
         if request.user == self.user:

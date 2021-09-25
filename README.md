@@ -10,12 +10,12 @@ REST API que simula todas las funcionalidades de Facebook
 ## Features
 ### :bust_in_silhouette: Users 
   + **User** 
-    + Sign-Up
+    + Sign-Up asincronamente
     + Verificación de cuenta
     + Refrescar token de verificación de cuenta
     + Sign-In
     + Generación de token para recuperar contraseña
-    + Recuperación o Actualización de contraseña
+    + Recuperación asincrona o Actualización de contraseña
     + Detalle de Usuario
     + Actualización de datos de usuario
   + **Profile**
@@ -23,6 +23,7 @@ REST API que simula todas las funcionalidades de Facebook
     + Follow o unfollow de usuario
     + Listar followers y following de un perfil
     + Listar amigos de un usuario
+    + Eliminar amigo
     + Actualización completa o parcial de perfil
     + Actualización completa o parcial de detalles de perfil
   + **Friend request**
@@ -85,7 +86,7 @@ REST API que simula todas las funcionalidades de Facebook
   - [ ] Eventos :date:
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:
-  - [ ] Tareas asíncronas y periódicas con Celery :hourglass:
+  - [ ] Más tareas asíncronas y periódicas con Celery :hourglass:
   - [ ] Sistema de notificaciones :bell:
   - [ ] Chat :speech_balloon:
   - [ ] Sistema de OAuth2 :warning::octocat:
