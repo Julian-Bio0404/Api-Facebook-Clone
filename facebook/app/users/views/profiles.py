@@ -1,7 +1,6 @@
 """Profiles views."""
 
 # Django
-from facebook.app.users.permissions import friend_request
 from django.db.models import Q
 
 # Django REST framework
