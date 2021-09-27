@@ -5,6 +5,8 @@ REST API que simula todas las funcionalidades de Facebook
 ![](https://img.shields.io/badge/django-v3.2.5-blue)
 ![](https://img.shields.io/badge/djangorestframework-v3.12.4-blue)
 ![](https://img.shields.io/badge/psycopg2-v2.9.1-blue)
+![](https://img.shields.io/badge/celery-v5.1.2-blue)
+![](https://img.shields.io/badge/channels-v3.0.4-blue)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/Julian-Bio0404/Api-Facebook-Clone)
 
 ## Features
@@ -81,6 +83,10 @@ REST API que simula todas las funcionalidades de Facebook
     + Listar posts de una página
     + Añadir o eliminar admin de una página
     + Invitación a dar like a una página
+
+### :speech_balloon: Chats
+  + **Chat**
+    + Chat uno a uno por conexión websockets (por depurar)
   
 ## Features faltantes
   - [ ] Eventos :date:

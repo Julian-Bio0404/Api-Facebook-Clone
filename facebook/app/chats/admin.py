@@ -21,4 +21,3 @@ class ThreadAdmin(admin.ModelAdmin):
 
     model = Thread
     inlines = (MessageInline,)
-

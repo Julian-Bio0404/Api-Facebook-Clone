@@ -1,4 +1,4 @@
-{% extends 'chat/base.html' %}
+{% extends 'chats/base.html' %}
 
 {% block content %}
     <h3>You: {{me.username}}</h3>
@@ -18,10 +18,13 @@
 {% block custom_javascript %}
 <script>
         const url = 'ws://localhost:8000/ws' + window.location.pathname;
+        const parts = window.location.href.split('?')
+        if (parts.length == 2) {
+            url += '?' + parts[1];
+        }
         const ws = new WebSocket(url)
         ws.onopen = function(event) {
             console.log("Connection is opened.");
-            ws.send("Thanks for connecting.");
         }
 
         ws.onmessage = function(event) {
@@ -53,3 +56,4 @@
             return false;
         }
 </script>
+{% endblock custom_javascript %}

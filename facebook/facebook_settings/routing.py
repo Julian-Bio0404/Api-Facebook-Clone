@@ -10,12 +10,16 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 # Consumers
 from app.chats.consumers import ChatConsumer, EchoConsumer
 
+# Middlewares
+from app.chats.middlewares import TokenAuthMiddleware
+
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
-        URLRouter([
-            path('ws/chats/<str:username>/', ChatConsumer),
-            path('ws/chats/', EchoConsumer)
-        ])
-    )
+    'websocket': TokenAuthMiddleware(
+        AuthMiddlewareStack(
+            URLRouter([
+                path('ws/chats/<str:username>/', ChatConsumer),
+                path('ws/chats/', EchoConsumer)
+            ]))
+        )
 })
