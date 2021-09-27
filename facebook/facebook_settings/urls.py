@@ -13,5 +13,6 @@ urlpatterns = [
     path('', include(('app.posts.urls', 'posts'), namespace='posts')),
     path('', include(('app.groups.urls', 'groups'), namespace='groups')),
     path('', include(('app.fbpages.urls', 'pages'), namespace='pages')),
+    path('', include(('app.chats.urls', 'chats'), namespace='chats'))
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
