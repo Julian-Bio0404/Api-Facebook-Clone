@@ -26,3 +26,4 @@ celery==5.1.2
 
 # Channels
 channels==3.0.4
+channels-redis==3.3.0
