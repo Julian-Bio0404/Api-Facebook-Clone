@@ -1,4 +1,4 @@
-"""Celery tasks."""
+"""Users tasks."""
 
 # Utilities
 from datetime import timedelta
