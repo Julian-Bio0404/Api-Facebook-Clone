@@ -10,6 +10,9 @@ from app.users.models import User
 # Serializers
 from .media import ImageModelSerializer, VideoModelSerializer
 
+# Tasks
+from taskapp.tasks.notifications import create_notification
+
 
 class SharedPostModelSerializer(serializers.ModelSerializer):
     """
@@ -167,6 +170,13 @@ class PostModelSerializer(SharedPostModelSerializer):
                         raise serializers.ValidationError(
                             f'The user with username {username} does not exist.')
         post.save()
+        if user != post.user:
+            type = 'Post'
+            if post.destination in ['friend']:
+                friend_destination = User.objects.get(
+                    username=post.name_destination)
+                create_notification.delay(
+                    user.pk, friend_destination.pk, post.pk, type)
         return post
 
 

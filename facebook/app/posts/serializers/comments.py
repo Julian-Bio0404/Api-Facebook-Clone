@@ -6,6 +6,9 @@ from rest_framework import serializers
 # Models
 from app.posts.models import Comment
 
+# Tasks
+from taskapp.tasks.notifications import create_notification
+
 
 class CommentModelSerializer(serializers.ModelSerializer):
     """Post model serializer."""
@@ -28,12 +31,13 @@ class CommentModelSerializer(serializers.ModelSerializer):
         profile = user.profile
         post = self.context['post']
         comment = Comment.objects.create(
-            **data, user=user, 
-            profile=profile, 
-            post=post)
-        comment.save()
+            **data, user=user, profile=profile, post=post)
 
         # Post
         post.comments += 1
         post.save()
+        if user != post.user:
+            type = 'Comment Post'
+            create_notification.delay(
+                comment.user.pk, post.user.pk, type, comment.pk)
         return comment

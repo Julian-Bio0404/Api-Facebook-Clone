@@ -93,6 +93,5 @@ REST API que simula todas las funcionalidades de Facebook
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:
   - [ ] Más tareas asíncronas y periódicas con Celery :hourglass:
-  - [ ] Sistema de notificaciones :bell:
   - [ ] Sistema de OAuth2 :warning::octocat:
   - [ ] Dockerizar :whale:

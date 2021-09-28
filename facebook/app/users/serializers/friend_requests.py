@@ -9,6 +9,9 @@ from app.users.models import FriendRequest
 # Serializers
 from .users import UserModelSummarySerializer
 
+# Tasks
+from taskapp.tasks.notifications import create_notification
+
 
 class FriendRequestModelSerializer(serializers.ModelSerializer):
     """Friend request model serializer."""
@@ -64,11 +67,15 @@ class FriendRequestModelSerializer(serializers.ModelSerializer):
 
     def create(self, data):
         """Create a friend's request."""
+        requesting_user = self.context['requesting_user']
+        requested_user = self.context['requested_user']
         friend_request = FriendRequest.objects.create(
-            requesting_user=self.context['requesting_user'], 
-            requested_user=self.context['requested_user']
-        )
-        friend_request.save()
+            requesting_user=requesting_user, 
+            requested_user=requested_user)
+
+        type = 'Friend Request'
+        create_notification.delay(
+            requesting_user.pk, requested_user.pk, type, friend_request.pk)
         return friend_request
 
 
@@ -99,3 +106,7 @@ class AcceptFriendRequestSerializer(serializers.Serializer):
 
         requesting_user.profile.save()
         requested_user.profile.save()
+
+        type = 'Friend Accept'
+        create_notification.delay(
+            requested_user.pk, requesting_user.pk, type, friend_request.pk)

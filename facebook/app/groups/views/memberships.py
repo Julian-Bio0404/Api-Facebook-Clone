@@ -21,6 +21,9 @@ from app.users.models import User
 # Serializers
 from app.groups.serializers import MembershipModelSerializer, AddMemberSerializer
 
+# Tasks
+from taskapp.tasks.notifications import create_notification
+
 
 class MembershipViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
@@ -89,6 +92,10 @@ class MembershipViewSet(mixins.ListModelMixin,
             guest_user = User.objects.get(username=username)
             invitation = Invitation.objects.create(
                 sent_by=request.user, used_by=guest_user, group=self.group).code
+            type = 'Group Invitation'
+            create_notification.delay(
+                invitation.sent_by.pk, 
+                invitation.used_by.pk, type, invitation.group.pk)
             data = {
                 'message': f'You invited {guest_user.username} to join the {self.group.slug_name} group.',
                 'invitation code': invitation}

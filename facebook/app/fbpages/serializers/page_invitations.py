@@ -7,6 +7,9 @@ from rest_framework import serializers
 from app.fbpages.models import PageInvitation
 from app.users.models import User
 
+# Tasks 
+from taskapp.tasks.notifications import create_notification
+
 
 class PageInvitationSerializer(serializers.ModelSerializer):
     """Page invitation model serializer."""
@@ -57,4 +60,9 @@ class CreatePageInvitation(serializers.Serializer):
         invitation = PageInvitation.objects.create(
             **validated_data, 
             guest_user=self.context['user'], page=self.context['page'])
+            
+        type = 'Page Invitation'
+        create_notification.delay(
+            invitation.inviting_user.pk, 
+            invitation.guest_user.pk, type, invitation.page.pk)
         return invitation

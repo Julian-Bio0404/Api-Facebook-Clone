@@ -43,10 +43,11 @@ def create_notification(user1_pk, user2_pk, type, obj_pk):
         message += f'sent you a friend request.'
     elif type == 'Friend Accept':
         message += f'accepted your friend request.'
-        
+
     notification = Notification.objects.create(
         issuing_user=issuing_user, 
         receiving_user=receiving_user, 
+        notification_type=type,
         object_id=obj_pk, message=message)
 
     return notification

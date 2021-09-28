@@ -10,6 +10,9 @@ from app.posts.models import ReactionComment, ReactionPost
 from app.posts.serializers import CommentModelSerializer, PostModelSerializer
 from app.users.serializers import UserModelSummarySerializer
 
+# Tasks
+from taskapp.tasks.notifications import create_notification
+
 
 class ReactionPostModelSerializer(serializers.ModelSerializer):
     """Reaction post model serializer."""
@@ -29,10 +32,7 @@ class ReactionPostModelSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Velidate.
-
-        verify that the user's reaction does not exist yet.
-        """
+        """verify that the user's reaction does not exist yet."""
         try:
             user = self.context['user']
             reaction = ReactionPost.objects.get(user=user)
@@ -52,14 +52,17 @@ class ReactionPostModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         post = self.context['post']
         reaction_post = ReactionPost.objects.create(
-            **data, user=user,
-            profile=user.profile,
-            post=post)
+            **data, user=user, profile=user.profile, post=post)
         reaction_post.save()
 
         # Post
         post.reactions += 1
         post.save()
+
+        if user != post.user:
+            type = 'Reaction Post'
+            create_notification.delay(
+                reaction_post.user.pk, post.user.pk, type, post.pk)
         return reaction_post
 
 
@@ -96,10 +99,7 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Velidate.
-
-        verify that the user's reaction does not exist yet
-        """
+        """Verify that the user's reaction does not exist yet."""
         try:
             user = self.context['user']
             reaction = ReactionComment.objects.get(
@@ -120,14 +120,16 @@ class ReactionCommentModelSerializer(serializers.ModelSerializer):
         user = self.context['user']
         comment = self.context['comment']
         reaction_comment = ReactionComment.objects.create(
-            **data, user=user,
-            profile=user.profile,
-            comment=comment)
+            **data, user=user, profile=user.profile, comment=comment)
         reaction_comment.save()
 
         # Comment
         comment.reactions += 1
         comment.save()
+        if user != comment.user:
+            type = 'Reaction Comment'
+            create_notification.delay(
+                reaction_comment.user.pk, comment.user.pk, type, comment.pk)
         return reaction_comment
 
 
