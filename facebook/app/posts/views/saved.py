@@ -17,8 +17,8 @@ from app.posts.serializers import (CategorySavedModelSerializer,
                                    SavedPostModelSerializer)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_category(request):
     """Create Saved category."""
     categories = CategorySaved.objects.filter(
@@ -35,8 +35,8 @@ def create_category(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@permission_classes([IsSavedOwner])
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsSavedOwner])
 def retrieve_category(request, pk=None):
     """detail, update or delete a saved category."""
     try:
@@ -61,8 +61,8 @@ def retrieve_category(request, pk=None):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_saved(request, pk=None):
     """Handle post saved creation."""
     # Valida que el post y categoria existan
@@ -89,8 +89,8 @@ def create_saved(request, pk=None):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@permission_classes([IsSavedOwner])
 @api_view(['GET', 'DELETE'])
+@permission_classes([IsSavedOwner])
 def retrieve_saved(request, pk=None):
     """detail, update or delete a saved category."""
     try:
@@ -107,8 +107,8 @@ def retrieve_saved(request, pk=None):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def list_saved(request):
     """List all post saved of user."""
     saved = Saved.objects.filter(user=request.user)

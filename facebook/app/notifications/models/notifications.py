@@ -36,6 +36,9 @@ class Notification(FbModel):
     )
 
     notification_type = models.CharField(max_length=16, choices=NOTIFICATION_TYPE)
+    
+    object_id = models.IntegerField(
+        help_text="object's id on which the notification was generated.", null=True)
 
 
     def __str__(self):

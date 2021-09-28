@@ -94,6 +94,5 @@ REST API que simula todas las funcionalidades de Facebook
   - [ ] Sistema de configuración de privacidad de usuario :lock:
   - [ ] Más tareas asíncronas y periódicas con Celery :hourglass:
   - [ ] Sistema de notificaciones :bell:
-  - [ ] Chat :speech_balloon:
   - [ ] Sistema de OAuth2 :warning::octocat:
   - [ ] Dockerizar :whale:
