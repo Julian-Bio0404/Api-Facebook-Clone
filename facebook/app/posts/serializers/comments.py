@@ -39,5 +39,5 @@ class CommentModelSerializer(serializers.ModelSerializer):
         if user != post.user:
             type = 'Comment Post'
             create_notification.delay(
-                comment.user.pk, post.user.pk, type, comment.pk)
+                comment.user.pk, post.user.pk, type, comment.post.pk, comment.pk)
         return comment
