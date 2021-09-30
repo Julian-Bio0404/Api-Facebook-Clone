@@ -1,7 +1,15 @@
 """Notifications tasks."""
 
+from __future__ import absolute_import, unicode_literals
+
+# Utilities
+from datetime import timedelta
+
+# Django
+from django.utils import timezone
+
 # Celery
-from celery import shared_task
+from taskapp.celery import app
 
 # Models
 from app.fbpages.models import Page
@@ -11,7 +19,8 @@ from app.posts.models import Post, Comment, ReactionPost, ReactionComment
 from app.users.models import User
 
 
-@shared_task 
+# Asynch task
+@app.task 
 def create_notification(user1_pk, user2_pk, type, obj_pk, comment_pk=None):
     """
     Create notifications.
@@ -101,3 +110,13 @@ def create_notification(user1_pk, user2_pk, type, obj_pk, comment_pk=None):
             issuing_user=issuing_user, receiving_user=receiving_user, 
             notification_type=type, object_id=obj_pk, message=message)
     return notification
+
+
+# Periodic task
+@app.task
+def delete_notifications():
+    """Delete notifications 14 days old."""
+    now = timezone.now()
+    date = now - timedelta(days=14)
+    notifications = Notification.objects.filter(created__lte=date)
+    notifications.delete()

@@ -53,7 +53,8 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
-    'channels'
+    'channels',
+    'django_celery_beat'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS

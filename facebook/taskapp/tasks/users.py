@@ -1,5 +1,7 @@
 """Users tasks."""
 
+from __future__ import absolute_import, unicode_literals
+
 # Utilities
 from datetime import timedelta
 import jwt
@@ -11,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 # Celery
-from celery import shared_task
+from taskapp.celery import app
 
 # Models
 from app.users.models import User
@@ -28,7 +30,8 @@ def token_generation(user, type):
     return token
 
 
-@shared_task 
+# Asynch task
+@app.task
 def send_confirmation_email(user_pk):
     """Send account verification link to given user."""
     user = User.objects.get(pk=user_pk)
@@ -43,7 +46,8 @@ def send_confirmation_email(user_pk):
     msg.send()
 
 
-@shared_task 
+# Asynch task
+@app.task
 def send_restore_password_email(user_pk):
     """Send restore password link to given user."""
     user = User.objects.get(pk=user_pk)

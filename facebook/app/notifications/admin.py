@@ -14,6 +14,6 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = [
         'pk', 'issuing_user', 
         'receiving_user', 'message',
-        'notification_type'
+        'notification_type', 'object_id'
     ]
 

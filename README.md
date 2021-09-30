@@ -84,6 +84,19 @@ REST API que simula todas las funcionalidades de Facebook
     + Añadir o eliminar admin de una página
     + Invitación a dar like a una página
 
+### :bell: Notifications
+  + **Notification**
+    + Listar notificaciones
+    + Tarea periódica para eliminar notificaciones cada 14 días
+    + Notificaciones asincronas cuando:
+      + Publican posts en tu biografía
+      + Reaccionan a tu post
+      + Comentan en tu post
+      + Te envían una solicitud de amistad
+      + Aceptan una solicitud de amistad
+      + Te envían una invitación al unirse a un grupo
+      + Te envían una invitación a dar like a una fbpage
+
 ### :speech_balloon: Chats
   + **Chat**
     + Chat uno a uno por conexión websockets (por depurar)
@@ -92,6 +105,5 @@ REST API que simula todas las funcionalidades de Facebook
   - [ ] Eventos :date:
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:
-  - [ ] Más tareas asíncronas y periódicas con Celery :hourglass:
   - [ ] Sistema de OAuth2 :warning::octocat:
   - [ ] Dockerizar :whale:
