@@ -1,0 +1,7 @@
+.git
+.gitignore
+celerybeat*
+env/
+__pycache__/
+documentation*
+README.md
