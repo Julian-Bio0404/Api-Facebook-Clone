@@ -30,8 +30,8 @@ class ProfileViewSet(mixins.ListModelMixin,
     """
     Profile view set.
     Handle list profile, update profile, update profile details, 
-    follow or unfollow users, remove a friend, and list followers, 
-    following and friends.
+    follow or unfollow users, remove a friend, list followers, 
+    following friends, and profile's posts.
     """
 
     queryset = Profile.objects.filter(user__is_verified=True)
@@ -66,7 +66,7 @@ class ProfileViewSet(mixins.ListModelMixin,
         Restric according to the user requesting and privacy of posts.
         """
         profile = self.get_object()
-        friends = list(profile.friends.all())
+        friends = profile.friends.all()
 
         if request.user.profile == profile:
             posts = Post.objects.filter(
@@ -81,8 +81,7 @@ class ProfileViewSet(mixins.ListModelMixin,
                 | Q(destination='FRIEND', name_destination=profile.user.username, specific_friends__in=[request.user])
                 | Q(profile=profile, destination='BIOGRAPHY', privacy='FRIENDS_EXC')
                 | Q(destination='FRIEND', name_destination=profile.user.username, privacy='FRIENDS_EXC')
-            ).exclude(
-                Q(friends_exc__in=[request.user]))
+            ).exclude(Q(friends_exc__in=[request.user]))
         else:
             posts = Post.objects.filter(
                 Q(profile=profile, destination='BIOGRAPHY', privacy='PUBLIC')

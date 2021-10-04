@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from app.posts.permissions import IsSavedOwner
 
 # Models
-from app.posts.models import CategorySaved, Post, Saved
+from app.posts.models import CategorySaved, Saved
 
 # Serializers
 from app.posts.serializers import (CategorySavedModelSerializer,
@@ -38,7 +38,7 @@ def create_category(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsSavedOwner])
 def retrieve_category(request, pk=None):
-    """detail, update or delete a saved category."""
+    """Detail, update or delete a saved category."""
     try:
         category = CategorySaved.objects.get(user=request.user, pk=pk)
     except CategorySaved.DoesNotExist:
@@ -61,38 +61,10 @@ def retrieve_category(request, pk=None):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_saved(request, pk=None):
-    """Handle post saved creation."""
-    # Valida que el post y categoria existan
-    try:
-        post = Post.objects.get(pk=pk)
-        saved_category = CategorySaved.objects.get(
-            user=request.user, name=request.data['name'])
-    except Post.DoesNotExist or CategorySaved.DoesNotExist:
-        data = {'message': 'The category or the post does not exist.'}
-        return Response(data, status=status.HTTP_404_NOT_FOUND)
-
-    # Valida que aun no exista el post guardado
-    try:
-        Saved.objects.get(user=request.user, post=post)
-        data = {'message': 'The saved already exists.'}
-        return Response(data, status=status.HTTP_403_FORBIDDEN)
-    except Saved.DoesNotExist:
-        serializer = SavedPostModelSerializer(
-            data=request.data, 
-            context={
-                'user': request.user, 'post': post, 'saved_category': saved_category})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
 @api_view(['GET', 'DELETE'])
 @permission_classes([IsSavedOwner])
 def retrieve_saved(request, pk=None):
-    """detail, update or delete a saved category."""
+    """Detail or delete a post saved."""
     try:
         saved = Saved.objects.get(user=request.user, pk=pk)
     except Saved.DoesNotExist:

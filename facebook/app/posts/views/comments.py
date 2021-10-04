@@ -52,12 +52,14 @@ class CommentViewSet(mixins.CreateModelMixin,
 
     def get_permissions(self):
         """Assign permissions based on action."""
-        if self.action in ['create', 'retrieve', 'list', 'react', 'reactions']:
+        if self.action in ['create', 'retrieve', 'react', 'reactions']:
             permissions = [IsAuthenticated, IsFriendPostOwner]
-        elif self.action in ['update']:
+        elif self.action in ['update', 'partial_update']:
            permissions = [IsAuthenticated, IsCommentOwner]
         elif self.action in ['destroy']:
             permissions = [IsAuthenticated, IsCommentOrPostOwner]
+        else:
+            permissions = [IsAuthenticated]
         return[p() for p in permissions]
     
     def create(self, request, *args, **kwargs):
@@ -67,6 +69,32 @@ class CommentViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        """Restrict comments according to post privacy."""
+        user = request.user
+        friends = self.object.profile.friends.all()
+
+        if self.object.privacy == 'PUBLIC':
+            pass
+        elif self.object.privacy == 'FRIENDS':
+            if user in friends or user == self.object.user:
+                pass
+            else:
+                data = {'message': 'Content not available.'}
+                return Response(data, status=status.HTTP_403_FORBIDDEN)
+        elif self.object.privacy in ['SPECIFIC_FRIENDS', 'FRIENDS_EXC']:
+            if (user in self.object.specific_friends.all() 
+                or user not in self.object.friends_exc.all() 
+                or user == self.object.user):
+                pass
+            else:
+                data = {'message': 'Content not available.'}
+                return Response(data, status=status.HTTP_403_FORBIDDEN)
+
+        comments = Comment.objects.filter(post=self.object)
+        data = CommentModelSerializer(comments, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def react(self, request, *args, **kwargs):

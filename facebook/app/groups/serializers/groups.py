@@ -18,7 +18,3 @@ class GroupModelSerializer(serializers.ModelSerializer):
             "about", "cover_photo",
             "is_public",
         ]
-
-        read_only_fields = [
-            "is_public"
-        ]

@@ -3,12 +3,20 @@ version: "3.9"
 services:
   rabbitmq:
     image: rabbitmq:3.9.0-alpine
+    deploy:
+      resources:
+          limits:
+            memory: 500M
     ports:
       - "5672:5672"
       - "15672:15672"
 
   postgres:
     image: postgres:14.0-alpine
+    deploy:
+      resources:
+          limits:
+            memory: 500M
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     environment:
@@ -22,6 +30,10 @@ services:
     build: .
     volumes:
       - .:/code
+    deploy:
+      resources:
+          limits:
+            memory: 500M
     ports:
       - "8000:8000"
     environment: 
@@ -34,6 +46,10 @@ services:
     build: .
     volumes:
         - .:/code
+    deploy:
+      resources:
+          limits:
+            memory: 500M
     ports: []
     depends_on:
         - rabbitmq
@@ -43,6 +59,10 @@ services:
     build: .
     volumes:
         - .:/code
+    deploy:
+      resources:
+          limits:
+            memory: 500M
     ports: []
     depends_on:
         - rabbitmq

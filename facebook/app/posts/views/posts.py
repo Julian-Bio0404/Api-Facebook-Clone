@@ -13,12 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 from app.posts.permissions import IsFriend, IsPostOwner
 
 # Models
-from app.posts.models import Post, ReactionPost, Shared
+from app.posts.models import CategorySaved, Post, ReactionPost, Saved, Shared
 
 # Serializers
 from app.posts.serializers import (PostModelSerializer,
                                    ReactionPostModelSerializer,
                                    ReactionPostModelSummarySerializer,
+                                   SavedPostModelSerializer,
                                    SharedModelSerializer)
 
 
@@ -32,7 +33,7 @@ class PostViewSet(mixins.CreateModelMixin,
     Post view set.
     Handle list, create, update, destroy,
     sharing, list shares, react to a post
-    and list post's reactions.
+    list post's reactions and post saving.
     """
 
     serializer_class = PostModelSerializer
@@ -41,12 +42,10 @@ class PostViewSet(mixins.CreateModelMixin,
         """Restrict list to public or friend's posts."""
         queryset = Post.objects.all()
         user = self.request.user
-        friends = list(user.profile.friends.all())
-        friends.append(user)
-
+        friends = user.profile.friends.all()
         if self.action == 'list':
             queryset = Post.objects.filter(
-                Q(privacy='PUBLIC') | Q(user__in=friends, privacy='FRIENDS') 
+                Q(user=user) | Q(privacy='PUBLIC') | Q(user__in=friends, privacy='FRIENDS') 
                 | Q(user__in=friends, privacy='SPECIFIC_FRIENDS', specific_friends__in=[user])
                 | Q(specific_friends__in=[user])).exclude(Q(friends_exc__in=[user]))
         return queryset
@@ -54,9 +53,9 @@ class PostViewSet(mixins.CreateModelMixin,
     def get_permissions(self):
         """Assign permissions based on action."""
         if self.action in [
-            'retrieve', 'react', 'reactions', 'share', 'post_shares']:
+            'retrieve', 'react', 'reactions', 'share', 'post_shares', 'saved']:
             permissions = [IsFriend]
-        elif self.action in ['update', 'partial_update']:
+        elif self.action in ['update', 'partial_update', 'destroy']:
            permissions = [IsAuthenticated, IsPostOwner]
         else:
             permissions = [IsAuthenticated]
@@ -97,7 +96,7 @@ class PostViewSet(mixins.CreateModelMixin,
         """Handles share post."""
         post = self.get_object()
         serializer = PostModelSerializer(
-            data=request.data, context={'user': request.user,'post': post, 'request': request})
+            data=request.data, context={'user': request.user, 'post': post, 'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -109,3 +108,30 @@ class PostViewSet(mixins.CreateModelMixin,
         shares = Shared.objects.filter(post=post)
         serializer = SharedModelSerializer(shares, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def saved(self, request, *args, **kwargs):
+        """Handles post saving."""
+        post = self.get_object()
+        
+        # Valida que el post y categoria existan
+        try:
+            saved_category = CategorySaved.objects.get(
+                user=request.user, name=request.data['name'])
+        except CategorySaved.DoesNotExist:
+            data = {'message': 'The category does not exist.'}
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+        # Valida que aun no exista el post guardado
+        try:
+            Saved.objects.get(user=request.user, post=post)
+            data = {'message': 'The saved already exists.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        except Saved.DoesNotExist:
+            serializer = SavedPostModelSerializer(
+                data=request.data, 
+                context={
+                    'user': request.user, 'post': post, 'saved_category': saved_category})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)

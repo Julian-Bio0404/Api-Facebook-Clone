@@ -9,7 +9,7 @@ from rest_framework.routers import DefaultRouter
 # Views
 from .views import (CommentViewSet, PostViewSet,
                     create_category, retrieve_category, 
-                    create_saved, retrieve_saved, list_saved)
+                    retrieve_saved, list_saved)
 
 
 router = DefaultRouter()
@@ -23,7 +23,6 @@ urlpatterns = [
     path('posts/collections/<int:pk>/', retrieve_category),
     path('saved/', list_saved),
     path('saved/<int:pk>/', retrieve_saved),
-    path('posts/<int:pk>/saved/', create_saved),
     path('', include(router.urls))
 ]
 

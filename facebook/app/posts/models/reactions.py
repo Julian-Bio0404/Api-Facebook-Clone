@@ -22,17 +22,12 @@ class ReactionPost(FbModel):
     ]
 
     reaction = models.CharField(
-        help_text='react to a post', 
-        max_length=5, 
-        choices=REACTIONS
-    )
+        help_text='react to a post', max_length=5, choices=REACTIONS)
 
     def __str__(self):
         """Return user, post and reaction."""
         return '@{} reacted to your post {}'.format(
-            self.user.username, 
-            self.post.pk
-        )
+            self.user.username, self.post.pk)
 
 
 class ReactionComment(FbModel):
@@ -55,5 +50,4 @@ class ReactionComment(FbModel):
     def __str__(self):
         """Return user, post and reaction."""
         return '@{} reacted to your comment {}'.format(
-            self.user.username, 
-            self.comment.text)
+            self.user.username, self.comment.text)

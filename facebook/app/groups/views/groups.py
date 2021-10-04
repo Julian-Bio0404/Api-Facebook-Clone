@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
-from app.groups.permissions import IsGroupAdmin
+from app.groups.permissions import IsGroupAdmin, IsPublicGroup
 
 # Models
 from app.groups.models import Group, Membership
@@ -30,8 +30,8 @@ class GroupeViewSet(mixins.CreateModelMixin,
                     viewsets.GenericViewSet):
     """
     Group view set.
-    Handle list, update, partial update, delete
-    groups and list group's posts.
+    Handle list, detail, update, partial update, 
+    delete groups and list group's posts.
     """
 
     serializer_class = GroupModelSerializer
@@ -42,19 +42,21 @@ class GroupeViewSet(mixins.CreateModelMixin,
     ordering = ('-members__count',)
     filter_fields = ('is_public',)  # DjangoFilterBackend
 
+    def get_permissions(self):
+        """Assign permissions based on action."""
+        permissions = [IsAuthenticated]
+        if self.action in ['retrieve']:
+            permissions.append(IsPublicGroup)
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permissions.append(IsGroupAdmin)
+        return [permission() for permission in permissions]
+
     def get_queryset(self):
         """Restrict list to public-only."""
         queryset = Group.objects.all()
         if self.action == 'list':
             return queryset.filter(is_public=True)
         return queryset
-
-    def get_permissions(self):
-        """Assign permissions based on action."""
-        permissions = [IsAuthenticated]
-        if self.action in ['update', 'partial_update', 'destroy']:
-            permissions.append(IsGroupAdmin)
-        return [permission() for permission in permissions]
 
     def perform_create(self, serializer):
         """Assign group admin."""
@@ -73,8 +75,7 @@ class GroupeViewSet(mixins.CreateModelMixin,
         if group.is_public == False:
             try:
                 Membership.objects.get(
-                    user=request.user, group=group,
-                    is_active=True)
+                    user=request.user, group=group, is_active=True)
             except Membership.DoesNotExist:
                 data = {'message': 'You do not have permission to perform this action.'}
                 return Response(data, status=status.HTTP_403_FORBIDDEN)

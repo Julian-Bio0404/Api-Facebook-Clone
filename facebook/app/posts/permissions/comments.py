@@ -26,29 +26,25 @@ class IsCommentOrPostOwner(BasePermission):
 class IsFriendPostOwner(BasePermission):
     """Allow access only to friends of the post owner."""
 
-    def has_permission(self, request, view):
-        obj = view.object
-        return self.has_object_permission(request, view, obj)
-
     def has_object_permission(self, request, view, obj):
         """Check privacy obj and if user is friend of the post owner. """
-        post_owner = obj.user
+        post_owner = obj.post.user
         friends = post_owner.profile.friends.all()
         
-        if obj.privacy == 'PUBLIC':
+        if obj.post.privacy == 'PUBLIC':
             return True
-        elif obj.privacy == 'FRIENDS':
+        elif obj.post.privacy == 'FRIENDS':
             if request.user in friends or request.user == post_owner:
                 return True
             else:
                 return False
-        elif obj.privacy == 'SPECIFIC_FRIENDS':
-            if request.user in obj.specific_friends.all() or request.user == post_owner:
+        elif obj.post.privacy == 'SPECIFIC_FRIENDS':
+            if request.user in obj.post.specific_friends.all() or request.user == post_owner:
                 return True
             else:
                 return False
-        elif obj.privacy == 'FRIENDS_EXC':
-            if request.user in obj.friends_exc.all():
+        elif obj.post.privacy == 'FRIENDS_EXC':
+            if request.user in obj.post.friends_exc.all():
                 return False
             else: 
                 return True

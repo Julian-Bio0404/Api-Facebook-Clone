@@ -4,6 +4,7 @@
 from rest_framework import serializers
 
 # Models
+from app.groups.models import Membership
 from app.posts.models import Picture, Post, Shared, Video
 from app.users.models import User
 
@@ -91,6 +92,23 @@ class PostModelSerializer(SharedPostModelSerializer):
                 and 'specific_friends' not in self.context['request'].data.keys()):
                     raise serializers.ValidationError(
                         'You must specify a list of usernames in specific_friends.')
+        else:
+            if ('friends_exc' in self.context['request'].data.keys() 
+                or 'specific_friends' in self.context['request'].data.keys()):
+                raise serializers.ValidationError(
+                    'You must specify privacy in FRIENDS_EXC or SPECIFIC_FRIENDS.')
+
+        # Group post validation
+        if data['destination'] in ['GROUP']:
+            membership = Membership.objects.filter(
+                group__slug_name=data['name_destination'], 
+                user=self.context['user'], is_active=True)
+
+            if membership.exists():
+                pass
+            else:
+                raise serializers.ValidationError(
+                    'You do not belong to this group.')
 
         # Si es un repost, NO permite que se publique con los campos incluidos en fields
         if 'post' in self.context.keys():

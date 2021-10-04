@@ -19,3 +19,20 @@ class IsGroupAdmin(BasePermission):
         except Membership.DoesNotExist:
             return False
         return True
+
+
+class IsPublicGroup(BasePermission):
+    """
+    Allow access only members if 
+    the group is public.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        """Check requesting user and group admin are the same."""
+        if obj.is_public == False:
+            try:
+                Membership.objects.get(
+                    user=request.user, group=obj, is_active=True)
+            except Membership.DoesNotExist:
+                return False
+        return True
