@@ -3,5 +3,5 @@
 celerybeat*
 env/
 __pycache__/
-documentation*
+Clon-Facebook.postman_collection.json
 README.md

@@ -63,9 +63,9 @@ class FriendRequestViewSet(mixins.CreateModelMixin,
         """List all user's friend request."""
         if request.user == self.user:
             friend_requests = FriendRequest.objects.filter(
-                requested_user=request.user)
-            serializer = FriendRequestModelSerializer(friend_requests, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+                requested_user=request.user, accepted=False)
+            data = FriendRequestModelSerializer(friend_requests, many=True).data
+            return Response(data, status=status.HTTP_200_OK)
         else:
             data = {'message': 'You do not have permission for this action.'}
             return Response(data, status=status.HTTP_403_FORBIDDEN)

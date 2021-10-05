@@ -87,7 +87,7 @@ REST API que simula todas las funcionalidades de Facebook
 ### :bell: Notifications
   + **Notification**
     + Listar notificaciones
-    + Tarea periódica para eliminar notificaciones cada 14 días
+    + Tarea periódica diaria para eliminar notificaciones con 14 días de antigüedad
     + Notificaciones asincronas cuando:
       + Publican posts en tu biografía
       + Reaccionan a tu post
@@ -106,3 +106,12 @@ REST API que simula todas las funcionalidades de Facebook
   - [ ] Hashtags :pushpin:
   - [ ] Sistema de configuración de privacidad de usuario :lock:
   - [ ] Sistema de OAuth2 :warning::octocat:
+
+## Documentación
+### Para correr el proyecto:
+  - Clone este proyecto con: git clone https://github.com/Julian-Bio0404/Api-Facebook-Clone.git
+  - Construya las imágenes con: docker-compose build
+  - Levante los servicios con: docker-compose up
+### Para ver la documentacion de la API REST y ver cómo jugar con ella, puede:
+  - Importar el archivo Clon-Facebook.postman_collection.json a su cuenta de Postman.
+  - O visite la documentación en: https://documenter.getpostman.com/view/15752557/UUy65Pby
