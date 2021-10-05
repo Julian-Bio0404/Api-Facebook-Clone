@@ -12,13 +12,13 @@ from rest_framework.permissions import IsAuthenticated
 from app.fbpages.models import PageInvitation
 from app.notifications.models import Notification
 from app.posts.models import Post, Comment
-from app.users.models import FriendRequest, Profile
+from app.users.models import FriendRequest, User
 
 # Serializers
 from app.fbpages.serializers import PageInvitationSerializer
 from app.notifications.serializers import NotificationModelSerializer
 from app.posts.serializers import PostModelSerializer, CommentModelSerializer
-from app.users.serializers import FriendRequestModelSerializer, ProfileModelSerializer
+from app.users.serializers import FriendRequestModelSerializer, UserModelSerializer
 
 
 @api_view(['GET'])
@@ -55,8 +55,8 @@ def detail_notification(request, pk):
             obj = FriendRequest.objects.get(pk=object_id)
             data = FriendRequestModelSerializer(obj).data
         elif notif_type == 'Friend Accept':
-            obj = Profile.objects.get(pk=object_id)
-            data = ProfileModelSerializer(obj).data
+            obj = User.objects.get(pk=object_id)
+            data = UserModelSerializer(obj).data
         elif notif_type == 'Page Invitation':
             obj = PageInvitation.objects.get(pk=object_id)
             data = PageInvitationSerializer(obj).data

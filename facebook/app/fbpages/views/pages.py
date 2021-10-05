@@ -1,7 +1,7 @@
 """Fbpages views."""
 
 # Django REST framework
-from rest_framework import mixins, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -27,13 +27,13 @@ from app.posts.models import Post
 from app.users.models import User
 
 
-class PageViewSet(mixins.CreateModelMixin,
-                  mixins.ListModelMixin,
-                  mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.DestroyModelMixin,
-                  viewsets.GenericViewSet):
-    """Page view set."""
+class PageViewSet(viewsets.ModelViewSet):
+    """
+    Page view set.
+    Handle create, update, update details a page,
+    list followers and posts, follow a page, 
+    invitation to like and add or remove admin page. 
+    """
 
     queryset = Page.objects.all()
     serializer_class = PageModelSerializer
@@ -78,8 +78,8 @@ class PageViewSet(mixins.CreateModelMixin,
         serializer = CreatePagePostModelSerializer(
             data=request.data,
             context={
-                'user': request.user, 'destination': 'PAGE',
-                'name_destination': page.slug_name, 'privacy': 'PUBLIC'})
+                'user': request.user, 'request': request, 
+                'destination': 'PAGE','name_destination': page.slug_name, 'privacy': 'PUBLIC'})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -168,7 +168,7 @@ class PageViewSet(mixins.CreateModelMixin,
             if admin in page.admins.all():
                 page.admins.remove(admin)
                 page.save()
-                data = {'message': f'{admin.username} admin removed.'}
+                data = {'message': f'Admin {admin.username} removed.'}
             else:
                 data = {'message': 'User is not a admin.'}
             return Response(data, status=status.HTTP_200_OK)

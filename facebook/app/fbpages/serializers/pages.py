@@ -43,11 +43,8 @@ class PageModelSerializer(serializers.ModelSerializer):
     def create(self, data):
         """Create a page."""
         creator = self.context['creator']
-
-        try:
-            category = Category.objects.get(name=self.context['category'])
-        except Category.DoesNotExist:
-            raise serializers.ValidationError('The category does not exist.')
+        category, created = Category.objects.get_or_create(
+            name=self.context['category'])
         page = Page.objects.create(**data, creator=creator, category=category)
         PageDetail.objects.create(page=page)
         return page

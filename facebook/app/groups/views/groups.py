@@ -1,7 +1,7 @@
 """Groups views."""
 
 # Django REST framework
-from rest_framework import mixins, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -22,12 +22,7 @@ from app.groups.serializers import GroupModelSerializer
 from app.posts.serializers import PostModelSerializer
 
 
-class GroupeViewSet(mixins.CreateModelMixin,
-                    mixins.ListModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    viewsets.GenericViewSet):
+class GroupeViewSet(viewsets.ModelViewSet):
     """
     Group view set.
     Handle list, detail, update, partial update, 

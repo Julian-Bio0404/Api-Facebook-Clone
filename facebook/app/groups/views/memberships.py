@@ -53,7 +53,7 @@ class MembershipViewSet(mixins.ListModelMixin,
         permissions = [IsAuthenticated]
         if self.action in ['join_requests', 'confirm_membership']:
             permissions.append(IsMembershipAdmin)
-        if self.action in ['create', 'retrieve', 'list', 'invitations']:
+        if self.action in ['retrieve', 'invitations']:
             permissions.append(IsGroupMember)
         if self.action in ['confirm_invitation']:
             permissions.append(IsSelfUserInvited)
@@ -87,22 +87,27 @@ class MembershipViewSet(mixins.ListModelMixin,
     def invitations(self, request, *args, **kwargs):
         """Create a invitation."""
         username = request.data['username']
-
         try:
             guest_user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            data = {'message': "The user doesn't exist."}
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+        invitation = Invitation.objects.filter(used_by=guest_user, group=self.group)
+        if invitation.exists():
+            data = {'message': 'This user already has an invitation to this group.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        else:
             invitation = Invitation.objects.create(
                 sent_by=request.user, used_by=guest_user, group=self.group).code
             type = 'Group Invitation'
             create_notification.delay(
-                invitation.sent_by.pk, 
-                invitation.used_by.pk, type, invitation.group.pk)
+                request.user.pk, 
+                guest_user.pk, type, self.group.pk)
             data = {
                 'message': f'You invited {guest_user.username} to join the {self.group.slug_name} group.',
                 'invitation code': invitation}
             return Response(data, status=status.HTTP_201_CREATED)
-        except User.DoesNotExist:
-            data = {'message': "The user doesn't exist."}
-            return Response(data, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['post'])
     def confirm_invitation(self, request, *args, **kwargs):

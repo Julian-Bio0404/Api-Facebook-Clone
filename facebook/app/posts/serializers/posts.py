@@ -203,21 +203,20 @@ class CreatePagePostModelSerializer(PostModelSerializer):
 
     user = serializers.StringRelatedField(read_only=True)
 
-    class Meta:
-        """Meta options."""
-        model = Post
-        fields = [
-            'user','about', 'picture',
-            'video', 'privacy', 'feeling',
-            'location','reactions', 'destination',
-            'name_destination'
-        ]
-
-        read_only_fields = [
-            'user', 'reactions', 
-            'privacy', 'destination'
-            'name_destination'
-        ]
+    def validate(self, data):
+        """
+        Verify that privacy, destination and name 
+        destination is not in data.
+        """
+        if 'privacy' in data.keys():
+            raise serializers.ValidationError('Page posts are always public.')
+        if 'name_destination' in data.keys():
+            raise serializers.ValidationError(
+                'Destination name will always be the slug name of the page.')
+        if 'destination' in data.keys():
+            raise serializers.ValidationError(
+                'Post destination will always be page type.')
+        return data
 
     def create(self, data):
         """Create a post."""
@@ -229,7 +228,19 @@ class CreatePagePostModelSerializer(PostModelSerializer):
             privacy=self.context['privacy'],
             destination=self.context['destination'],
             name_destination=self.context['name_destination'])
-        post.save()
+        try:
+            videos = self.context['request'].data.getlist('videos')
+            pictures = self.context['request'].data.getlist('pictures')
+                
+            for image in pictures:
+                picture = Picture.objects.create(content=image)
+                post.pictures.add(picture)
+                
+            for i in videos:
+                video = Video.objects.create(content=i)
+                post.videos.add(video)
+        except AttributeError:
+            post.save()
         return post
 
 

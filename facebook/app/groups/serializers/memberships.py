@@ -55,9 +55,7 @@ class AddMemberSerializer(serializers.Serializer):
         """Verify code exists and that it is related to the group."""
         try:
             invitation = Invitation.objects.get(
-                code=data,
-                group=self.context['group'],
-                used=True)
+                code=data, group=self.context['group'], used=True)
         except Invitation.DoesNotExist:
             raise serializers.ValidationError('Invalid invitation code.')
         self.context['invitation'] = invitation
